@@ -24,7 +24,7 @@ A comprehensive Carbon Border Adjustment Mechanism (CBAM) reporting application 
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/cbam-reporting.git
+git clone https://github.com/tansuozcelebi/cbam-reporting.git
 
 # Navigate to project directory
 cd cbam-reporting
