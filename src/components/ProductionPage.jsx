@@ -2,21 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { Calculator, Save, Info } from 'lucide-react';
 
 const ProductionPage = ({ translations, onDataChange, data = {} }) => {
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [productionData, setProductionData] = useState({
     monthlyProduction: {
-      jan: data.monthlyProduction?.jan || 0,
-      feb: data.monthlyProduction?.feb || 0,
-      mar: data.monthlyProduction?.mar || 0,
-      apr: data.monthlyProduction?.apr || 0,
-      may: data.monthlyProduction?.may || 0,
-      jun: data.monthlyProduction?.jun || 0,
-      jul: data.monthlyProduction?.jul || 0,
-      aug: data.monthlyProduction?.aug || 0,
-      sep: data.monthlyProduction?.sep || 0,
-      oct: data.monthlyProduction?.oct || 0,
-      nov: data.monthlyProduction?.nov || 0,
-      dec: data.monthlyProduction?.dec || 0
-    }
+      jan: data.monthlyProduction?.jan || '',
+      feb: data.monthlyProduction?.feb || '',
+      mar: data.monthlyProduction?.mar || '',
+      apr: data.monthlyProduction?.apr || '',
+      may: data.monthlyProduction?.may || '',
+      jun: data.monthlyProduction?.jun || '',
+      jul: data.monthlyProduction?.jul || '',
+      aug: data.monthlyProduction?.aug || '',
+      sep: data.monthlyProduction?.sep || '',
+      oct: data.monthlyProduction?.oct || '',
+      nov: data.monthlyProduction?.nov || '',
+      dec: data.monthlyProduction?.dec || ''
+    },
+    year: data.year || new Date().getFullYear()
   });
 
   const months = [
@@ -36,7 +38,10 @@ const ProductionPage = ({ translations, onDataChange, data = {} }) => {
 
   // Calculate totals
   const calculateTotals = () => {
-    const monthlyValues = Object.values(productionData.monthlyProduction).map(v => parseFloat(v) || 0);
+    const monthlyValues = Object.values(productionData.monthlyProduction).map(v => {
+      const num = parseFloat(v);
+      return isNaN(num) ? 0 : num;
+    });
     const annualTotal = monthlyValues.reduce((sum, val) => sum + val, 0);
     
     const accumulated = [];
@@ -61,45 +66,113 @@ const ProductionPage = ({ translations, onDataChange, data = {} }) => {
       monthlyProduction: {
         ...productionData.monthlyProduction,
         [month]: value
-      }
+      },
+      year: selectedYear
+    };
+    setProductionData(newData);
+    onDataChange('production', newData);
+  };
+
+  const handleYearChange = (year) => {
+    setSelectedYear(year);
+    const newData = {
+      ...productionData,
+      year: year
     };
     setProductionData(newData);
     onDataChange('production', newData);
   };
 
   const handleSave = () => {
-    // Data is already being saved through onDataChange
-    alert(translations.saveProduction || 'Production data saved!');
+    // Trigger final save to ensure data is persistent
+    const finalData = {
+      ...productionData,
+      year: selectedYear
+    };
+    onDataChange('production', finalData);
+    
+    // Show success message
+    const message = translations.saveProductionSuccess || `Production data for ${selectedYear} saved successfully!`;
+    alert(message);
   };
 
+  // Update selectedYear when data prop changes
   useEffect(() => {
-    onDataChange('production', productionData);
-  }, []);
+    if (data.year) {
+      setSelectedYear(data.year);
+    }
+  }, [data.year]);
+
+  useEffect(() => {
+    if (Object.keys(data).length > 0) {
+      setProductionData({
+        monthlyProduction: {
+          jan: data.monthlyProduction?.jan || '',
+          feb: data.monthlyProduction?.feb || '',
+          mar: data.monthlyProduction?.mar || '',
+          apr: data.monthlyProduction?.apr || '',
+          may: data.monthlyProduction?.may || '',
+          jun: data.monthlyProduction?.jun || '',
+          jul: data.monthlyProduction?.jul || '',
+          aug: data.monthlyProduction?.aug || '',
+          sep: data.monthlyProduction?.sep || '',
+          oct: data.monthlyProduction?.oct || '',
+          nov: data.monthlyProduction?.nov || '',
+          dec: data.monthlyProduction?.dec || ''
+        },
+        year: data.year || new Date().getFullYear()
+      });
+    }
+  }, [data]);
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6 font-sans">
       {/* Header */}
       <div className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-red-600">
-        <div className="flex items-center gap-3 mb-4">
-          <Calculator className="h-8 w-8 text-red-600" />
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800">
-              {translations.production || 'Production'}
-            </h2>
-            <p className="text-gray-600">
-              {translations.productionHelp || 'Enter monthly production amounts in tons. This data will be used to calculate emissions per kg of production.'}
-            </p>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <Calculator className="h-8 w-8 text-red-600" />
+            <div>
+              <h2 className="text-2xl font-bold text-gray-800">
+                {translations.production || 'Production'}
+              </h2>
+              <p className="text-gray-600">
+                {translations.productionHelp || 'Enter monthly production amounts in tons. This data will be used to calculate emissions per kg of production.'}
+              </p>
+            </div>
+          </div>
+          
+          {/* Year Selection */}
+          <div className="flex items-center gap-3">
+            <label className="text-sm font-medium text-gray-700">
+              {translations.year || 'Year'}:
+            </label>
+            <select
+              value={selectedYear}
+              onChange={(e) => handleYearChange(parseInt(e.target.value))}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500 bg-white"
+            >
+              {Array.from({ length: 11 }, (_, i) => new Date().getFullYear() - 5 + i).map(year => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
           </div>
         </div>
       </div>
 
       {/* Monthly Production Input */}
       <div className="bg-white rounded-xl shadow-lg p-6">
-        <div className="flex items-center gap-3 mb-6">
-          <Info className="h-6 w-6 text-blue-600" />
-          <h3 className="text-xl font-semibold text-gray-800">
-            {translations.monthlyProduction || 'Monthly Production'}
-          </h3>
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Info className="h-6 w-6 text-blue-600" />
+            <h3 className="text-xl font-semibold text-gray-800">
+              {translations.monthlyProduction || 'Monthly Production'} - {selectedYear}
+            </h3>
+          </div>
+          
+          <div className="text-sm text-gray-600">
+            {translations.productionUnit || 'All values in tons (t)'}
+          </div>
         </div>
 
         {/* Production Input Grid */}

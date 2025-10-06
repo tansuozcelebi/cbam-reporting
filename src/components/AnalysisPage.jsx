@@ -8,10 +8,32 @@ const AnalysisPage = ({ productionData = {} }) => {
 
   const calculateEmissions = (category, entry) => {
     if (category === 'electricity') {
-      const factor = parseFloat(entry.supplierFactor) || 0.4;
+      const factor = parseFloat(entry.supplierFactor) || parseFloat(entry.co2EmissionFactor) || 0.4;
+      
+      // Check if monthly data exists and sum it up
+      if (entry.monthlyData) {
+        const monthlyValues = Object.values(entry.monthlyData).map(v => parseFloat(v) || 0);
+        const totalMonthlyUsage = monthlyValues.reduce((sum, val) => sum + val, 0);
+        if (totalMonthlyUsage > 0) {
+          return totalMonthlyUsage * factor / 1000;
+        }
+      }
+      
+      // Fall back to single usage value if no monthly data
       const usage = parseFloat(entry.usage) || 0;
       return usage * factor / 1000;
     }
+    
+    // For other categories, check monthly data first
+    if (entry.monthlyData) {
+      const monthlyValues = Object.values(entry.monthlyData).map(v => parseFloat(v) || 0);
+      const totalMonthlyAmount = monthlyValues.reduce((sum, val) => sum + val, 0);
+      if (totalMonthlyAmount > 0) {
+        return totalMonthlyAmount * 0.5; // Using default factor - should be category-specific
+      }
+    }
+    
+    // Fall back to single amount value
     const amount = parseFloat(entry.amount) || 0;
     return amount * 0.5;
   };
@@ -50,21 +72,39 @@ const AnalysisPage = ({ productionData = {} }) => {
     };
   }).filter(item => item.value > 0).sort((a, b) => b.value - a.value);
 
-  // Monthly trend data (simulated)
-  const monthlyData = [
-    { month: 'Jan', emissions: (totalEmissions * 0.08).toFixed(2) },
-    { month: 'Feb', emissions: (totalEmissions * 0.07).toFixed(2) },
-    { month: 'Mar', emissions: (totalEmissions * 0.09).toFixed(2) },
-    { month: 'Apr', emissions: (totalEmissions * 0.08).toFixed(2) },
-    { month: 'May', emissions: (totalEmissions * 0.085).toFixed(2) },
-    { month: 'Jun', emissions: (totalEmissions * 0.09).toFixed(2) },
-    { month: 'Jul', emissions: (totalEmissions * 0.075).toFixed(2) },
-    { month: 'Aug', emissions: (totalEmissions * 0.08).toFixed(2) },
-    { month: 'Sep', emissions: (totalEmissions * 0.09).toFixed(2) },
-    { month: 'Oct', emissions: (totalEmissions * 0.085).toFixed(2) },
-    { month: 'Nov', emissions: (totalEmissions * 0.08).toFixed(2) },
-    { month: 'Dec', emissions: (totalEmissions * 0.09).toFixed(2) }
-  ];
+  // Monthly trend data based on actual entries
+  const calculateMonthlyEmissions = () => {
+    const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+    const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    return months.map((monthKey, index) => {
+      let monthlyEmissions = 0;
+      
+      // Calculate emissions for each category for this month
+      Object.entries(entries).forEach(([category, items]) => {
+        items.forEach(item => {
+          if (item.monthlyData && item.monthlyData[monthKey]) {
+            const monthlyValue = parseFloat(item.monthlyData[monthKey]) || 0;
+            if (monthlyValue > 0) {
+              if (category === 'electricity') {
+                const factor = parseFloat(item.supplierFactor) || parseFloat(item.co2EmissionFactor) || 0.4;
+                monthlyEmissions += monthlyValue * factor / 1000;
+              } else {
+                monthlyEmissions += monthlyValue * 0.5; // Default factor for other categories
+              }
+            }
+          }
+        });
+      });
+      
+      return {
+        month: monthLabels[index],
+        emissions: monthlyEmissions.toFixed(2)
+      };
+    });
+  };
+
+  const monthlyData = calculateMonthlyEmissions();
 
   // Scope data for pie chart
   const scopeData = [
@@ -345,6 +385,40 @@ const AnalysisPage = ({ productionData = {} }) => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Monthly Breakdown Table */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h3 className="text-xl font-bold text-gray-800 mb-4">Monthly Emissions Breakdown</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Month</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Emissions (tCO₂e)</th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">% of Total</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {monthlyData.map((month, idx) => {
+                const percentage = totalEmissions > 0 ? ((parseFloat(month.emissions) / totalEmissions) * 100).toFixed(1) : 0;
+                return (
+                  <tr key={idx} className="hover:bg-gray-50">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{month.month}</td>
+                    <td className="px-4 py-3 text-sm text-right font-medium text-teal-700">{month.emissions}</td>
+                    <td className="px-4 py-3 text-sm text-right text-gray-600">{percentage}%</td>
+                  </tr>
+                );
+              })}
+              {/* Yearly Total Row */}
+              <tr className="bg-gray-100 font-bold">
+                <td className="px-4 py-3 text-sm font-bold text-gray-900">YEARLY TOTAL</td>
+                <td className="px-4 py-3 text-sm text-right font-bold text-teal-700">{totalEmissions.toFixed(2)}</td>
+                <td className="px-4 py-3 text-sm text-right font-bold text-gray-900">100.0%</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 

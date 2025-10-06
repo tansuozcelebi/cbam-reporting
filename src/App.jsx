@@ -53,7 +53,13 @@ const App = () => {
         refrigerants: [],
         remoteWorking: []
       });
-      setProductionData(allUserData[email].productionData || {});
+      setProductionData(allUserData[email].productionData || {
+        monthlyProduction: {
+          jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
+          jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
+        },
+        year: new Date().getFullYear()
+      });
     } else {
       // Initialize empty data for new user
       const emptyData = {
@@ -67,7 +73,13 @@ const App = () => {
           refrigerants: [],
           remoteWorking: []
         },
-        productionData: {}
+        productionData: {
+          monthlyProduction: {
+            jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
+            jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
+          },
+          year: new Date().getFullYear()
+        }
       };
       setEntries(emptyData.entries);
       setProductionData(emptyData.productionData);
