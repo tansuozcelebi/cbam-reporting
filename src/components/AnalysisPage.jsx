@@ -3,7 +3,7 @@ import { Download, Globe, BarChart3, FileText } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { AppContext } from '../App';
 
-const AnalysisPage = () => {
+const AnalysisPage = ({ productionData = {} }) => {
   const { t, entries } = useContext(AppContext);
 
   const calculateEmissions = (category, entry) => {
@@ -32,7 +32,7 @@ const AnalysisPage = () => {
     .reduce((sum, e) => sum + e.emissions, 0);
 
   const scope3Emissions = allEntries
-    .filter(e => ['flights', 'publicTransport', 'homeWorkers'].includes(e.category))
+    .filter(e => ['flights', 'publicTransport', 'remoteWorking'].includes(e.category))
     .reduce((sum, e) => sum + e.emissions, 0);
 
   const totalEmissions = scope1Emissions + scope2Emissions + scope3Emissions;
@@ -77,6 +77,35 @@ const AnalysisPage = () => {
   const mainCategory = categoryEmissions[0] || { name: t.electricity, value: 0 };
   const mainCategoryPercentage = totalEmissions > 0 ? ((mainCategory.value / totalEmissions) * 100).toFixed(1) : 0;
 
+  // Calculate emissions per kg of production
+  const calculateEmissionsPerKg = () => {
+    if (!productionData.monthlyProduction) return null;
+    
+    const monthlyValues = Object.values(productionData.monthlyProduction).map(v => parseFloat(v) || 0);
+    const annualProduction = monthlyValues.reduce((sum, val) => sum + val, 0);
+    
+    if (annualProduction === 0) return null;
+    
+    // Convert annual production from tons to kg (multiply by 1000)
+    const annualProductionKg = annualProduction * 1000;
+    
+    // Convert total emissions from tCO2e to gCO2e (multiply by 1,000,000)
+    const totalEmissionsGrams = totalEmissions * 1000000;
+    
+    // Calculate gCO2e per kg of production
+    const emissionsPerKg = totalEmissionsGrams / annualProductionKg;
+    
+    return {
+      annualProduction: annualProduction,
+      annualProductionKg: annualProductionKg,
+      totalEmissions: totalEmissions,
+      totalEmissionsGrams: totalEmissionsGrams,
+      emissionsPerKg: emissionsPerKg
+    };
+  };
+
+  const emissionsPerKgData = calculateEmissionsPerKg();
+
   return (
     <div className="max-w-7xl">
       {/* Header */}
@@ -92,7 +121,7 @@ const AnalysisPage = () => {
       </div>
 
       {/* Top Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-sm font-medium text-gray-600">{t.totalEmissions} (tCO2e)</h3>
@@ -118,6 +147,30 @@ const AnalysisPage = () => {
           </div>
           <p className="text-3xl font-bold text-gray-900">{allEntries.length}</p>
           <p className="text-xs text-gray-500 mt-1">Data points recorded</p>
+        </div>
+
+        {/* Emissions per kg Production Card */}
+        <div className={`rounded-lg shadow-sm p-6 ${emissionsPerKgData ? 'bg-orange-50 border border-orange-200' : 'bg-gray-50 border border-gray-200'}`}>
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-sm font-medium text-gray-600">{t.emissionsPerKg || 'Emissions per kg'}</h3>
+            <BarChart3 className={`${emissionsPerKgData ? 'text-orange-500' : 'text-gray-400'}`} size={20} />
+          </div>
+          {emissionsPerKgData ? (
+            <>
+              <p className="text-2xl font-bold text-orange-700">
+                {emissionsPerKgData.emissionsPerKg.toFixed(2)}
+              </p>
+              <p className="text-xs text-orange-600 mt-1">gCO₂e/kg production</p>
+              <div className="mt-2 text-xs text-gray-600">
+                <p>Total: {emissionsPerKgData.annualProduction.toFixed(1)} tons/year</p>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-2xl font-bold text-gray-400">--</p>
+              <p className="text-xs text-gray-500 mt-1">Enter production data</p>
+            </>
+          )}
         </div>
       </div>
 

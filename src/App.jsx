@@ -7,6 +7,7 @@ import Dashboard from './components/Dashboard';
 import InputForm from './components/InputForm';
 import ResultsPage from './components/ResultsPage';
 import AnalysisPage from './components/AnalysisPage';
+import ProductionPage from './components/ProductionPage';
 
 // Context for app state
 export const AppContext = createContext();
@@ -29,8 +30,10 @@ const App = () => {
     flights: [],
     publicTransport: [],
     refrigerants: [],
-    homeWorkers: []
+    remoteWorking: []
   });
+
+  const [productionData, setProductionData] = useState({});
 
   const t = translations[language];
 
@@ -40,10 +43,7 @@ const App = () => {
     
     // Load user's data if exists
     if (allUserData[email]) {
-      setEntries(allUserData[email]);
-    } else {
-      // Initialize empty data for new user
-      const emptyData = {
+      setEntries(allUserData[email].entries || {
         electricity: [],
         naturalGas: [],
         fuel: [],
@@ -51,9 +51,26 @@ const App = () => {
         flights: [],
         publicTransport: [],
         refrigerants: [],
-        homeWorkers: []
+        remoteWorking: []
+      });
+      setProductionData(allUserData[email].productionData || {});
+    } else {
+      // Initialize empty data for new user
+      const emptyData = {
+        entries: {
+          electricity: [],
+          naturalGas: [],
+          fuel: [],
+          cars: [],
+          flights: [],
+          publicTransport: [],
+          refrigerants: [],
+          remoteWorking: []
+        },
+        productionData: {}
       };
-      setEntries(emptyData);
+      setEntries(emptyData.entries);
+      setProductionData(emptyData.productionData);
       setAllUserData(prev => ({
         ...prev,
         [email]: emptyData
@@ -68,13 +85,33 @@ const App = () => {
     if (user?.email) {
       setAllUserData(prev => ({
         ...prev,
-        [user.email]: entries
+        [user.email]: {
+          entries: entries,
+          productionData: productionData
+        }
       }));
     }
     
     setIsLoggedIn(false);
     setUser(null);
     setCurrentPage('dashboard');
+  };
+
+  const handleProductionDataChange = (type, data) => {
+    if (type === 'production') {
+      setProductionData(data);
+      
+      // Save to user's data
+      if (user?.email) {
+        setAllUserData(prev => ({
+          ...prev,
+          [user.email]: {
+            ...prev[user.email],
+            productionData: data
+          }
+        }));
+      }
+    }
   };
 
   const addEntry = (category, entry) => {
@@ -151,8 +188,15 @@ const App = () => {
                 setCurrentPage={setCurrentPage}
               />
             )}
+            {currentPage === 'production' && (
+              <ProductionPage 
+                translations={t}
+                onDataChange={handleProductionDataChange}
+                data={productionData}
+              />
+            )}
             {currentPage === 'results' && <ResultsPage />}
-            {currentPage === 'analysis' && <AnalysisPage />}
+            {currentPage === 'analysis' && <AnalysisPage productionData={productionData} />}
           </main>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Home, Zap, Flame, Fuel, Car, Plane, Bus, Wind, Home as HomeIcon, BarChart3, FileText, LogOut } from 'lucide-react';
+import { Home, Zap, Flame, Fuel, Car, Plane, Bus, Wind, Home as HomeIcon, BarChart3, FileText, LogOut, Factory } from 'lucide-react';
 import { AppContext } from '../App';
 
 const Sidebar = ({ currentPage, setCurrentPage, currentInputForm, setCurrentInputForm, onLogout, entries }) => {
@@ -13,7 +13,7 @@ const Sidebar = ({ currentPage, setCurrentPage, currentInputForm, setCurrentInpu
     { id: 'flights', icon: Plane, label: t.flights, count: entries.flights.length },
     { id: 'publicTransport', icon: Bus, label: t.publicTransport, count: entries.publicTransport.length },
     { id: 'refrigerants', icon: Wind, label: t.refrigerants, count: entries.refrigerants.length },
-    { id: 'homeWorkers', icon: HomeIcon, label: t.homeWorkers, count: entries.homeWorkers.length }
+    { id: 'remoteWorking', icon: HomeIcon, label: t.remoteWorking, count: entries.remoteWorking.length }
   ];
 
   return (
@@ -63,6 +63,14 @@ const Sidebar = ({ currentPage, setCurrentPage, currentInputForm, setCurrentInpu
             ))}
           </div>
         </div>
+
+        <button
+          onClick={() => { setCurrentPage('production'); setCurrentInputForm(null); }}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg mt-4 ${currentPage === 'production' ? 'bg-teal-50 text-teal-700' : 'text-gray-700 hover:bg-gray-50'}`}
+        >
+          <Factory size={18} />
+          <span className="text-sm font-medium">{t.production}</span>
+        </button>
 
         <button
           onClick={() => { setCurrentPage('analysis'); setCurrentInputForm(null); }}

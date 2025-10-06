@@ -64,7 +64,7 @@ const InputForm = ({ category, setCurrentInputForm, setCurrentPage }) => {
     flights: Plane,
     publicTransport: Bus,
     refrigerants: Wind,
-    homeWorkers: Home
+    remoteWorking: Home
   };
 
   const Icon = categoryIcons[category];

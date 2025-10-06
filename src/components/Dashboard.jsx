@@ -13,7 +13,7 @@ const Dashboard = ({ setCurrentInputForm, setCurrentPage }) => {
     { id: 'flights', icon: Plane, label: t.flights, color: 'bg-indigo-100 text-indigo-700' },
     { id: 'publicTransport', icon: Bus, label: t.publicTransport, color: 'bg-purple-100 text-purple-700' },
     { id: 'refrigerants', icon: Wind, label: t.refrigerants, color: 'bg-teal-100 text-teal-700' },
-    { id: 'homeWorkers', icon: Home, label: t.homeWorkers, color: 'bg-green-100 text-green-700' }
+    { id: 'remoteWorking', icon: Home, label: t.remoteWorking, color: 'bg-green-100 text-green-700' }
   ];
 
   return (
