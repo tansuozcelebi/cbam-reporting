@@ -1,0 +1,19 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .krea-red { fill: #E53E3E; }
+    </style>
+  </defs>
+  
+  <!-- Main KREA logo paths based on the image -->
+  <path class="krea-red" d="M15 15 Q15 10 20 10 L30 10 Q35 10 35 15 L35 85 Q35 90 30 90 L20 90 Q15 90 15 85 Z"/>
+  
+  <path class="krea-red" d="M15 40 Q15 35 20 35 L45 35 Q50 35 50 40 L50 50 Q50 55 45 55 L20 55 Q15 55 15 50 Z"/>
+  
+  <path class="krea-red" d="M50 15 Q50 10 55 10 L65 10 Q70 10 70 15 L70 40 Q70 35 75 35 L85 35 Q90 35 90 40 L90 50 Q90 55 85 55 L75 55 Q70 55 70 50 L70 85 Q70 90 65 90 L55 90 Q50 90 50 85 Z"/>
+  
+  <path class="krea-red" d="M25 65 Q25 60 30 60 L55 60 Q60 60 60 65 L60 75 Q60 80 55 80 L30 80 Q25 80 25 75 Z"/>
+  
+  <!-- Additional decorative elements -->
+  <circle class="krea-red" cx="85" cy="70" r="4"/>
+</svg>
