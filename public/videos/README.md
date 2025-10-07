@@ -1,3 +1,6 @@
+
+Video'ları GROK ile oluşturdum... Tansu Ozcelebi 2025/10
+
 # Video Dosyaları
 
 Bu klasörde CBAM uygulaması için background videoları bulunmaktadır.

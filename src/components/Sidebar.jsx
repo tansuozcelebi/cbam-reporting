@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Home, Zap, Flame, Fuel, Car, Plane, Bus, Wind, Home as HomeIcon, BarChart3, FileText, LogOut, Factory, BatteryCharging } from 'lucide-react';
+import { Home, Zap, Flame, Fuel, Car, Plane, Bus, Wind, Home as HomeIcon, BarChart3, FileText, LogOut, Factory, BatteryCharging, BookOpen } from 'lucide-react';
 import { AppContext } from '../App';
 
 const Sidebar = ({ currentPage, setCurrentPage, currentInputForm, setCurrentInputForm, onLogout, entries }) => {
@@ -94,6 +94,14 @@ const Sidebar = ({ currentPage, setCurrentPage, currentInputForm, setCurrentInpu
         >
           <FileText size={18} />
           <span className="text-sm font-medium">{t.results}</span>
+        </button>
+
+        <button
+          onClick={() => { setCurrentPage('aboutCBAM'); setCurrentInputForm(null); }}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg mt-4 ${currentPage === 'aboutCBAM' ? 'bg-blue-50 text-blue-700' : 'text-gray-700 hover:bg-gray-50'}`}
+        >
+          <BookOpen size={18} />
+          <span className="text-sm font-medium">{t.aboutCBAM}</span>
         </button>
       </nav>
 

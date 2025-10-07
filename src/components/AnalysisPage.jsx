@@ -10,6 +10,33 @@ const AnalysisPage = ({ productionData = {} }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
 
+  // Get renewable energy data from localStorage
+  const getRenewableEnergyData = () => {
+    try {
+      const savedData = localStorage.getItem('renewableEnergyData');
+      return savedData ? JSON.parse(savedData) : [];
+    } catch (error) {
+      console.error('Error reading renewable energy data:', error);
+      return [];
+    }
+  };
+
+  // Calculate renewable energy CO2 reduction
+  const calculateRenewableReduction = () => {
+    const renewableData = getRenewableEnergyData();
+    let totalReduction = 0;
+    
+    renewableData.forEach(project => {
+      if (project.monthlyData) {
+        const monthlyValues = Object.values(project.monthlyData).map(v => parseFloat(v) || 0);
+        const totalGeneration = monthlyValues.reduce((sum, val) => sum + val, 0);
+        totalReduction += totalGeneration * 1; // 1 tCO₂/MWh reduction factor
+      }
+    });
+    
+    return totalReduction;
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -75,7 +102,12 @@ const AnalysisPage = ({ productionData = {} }) => {
     .filter(e => ['flights', 'publicTransport', 'remoteWorking'].includes(e.category))
     .reduce((sum, e) => sum + e.emissions, 0);
 
-  const totalEmissions = scope1Emissions + scope2Emissions + scope3Emissions;
+  // Calculate renewable energy reduction
+  const renewableReduction = calculateRenewableReduction();
+  
+  // Calculate net total emissions (subtract renewable energy reduction)
+  const grossTotalEmissions = scope1Emissions + scope2Emissions + scope3Emissions;
+  const totalEmissions = Math.max(0, grossTotalEmissions - renewableReduction);
   const scope1Percentage = totalEmissions > 0 ? ((scope1Emissions / totalEmissions) * 100).toFixed(1) : 0;
   const scope2Percentage = totalEmissions > 0 ? ((scope2Emissions / totalEmissions) * 100).toFixed(1) : 0;
   const scope3Percentage = totalEmissions > 0 ? ((scope3Emissions / totalEmissions) * 100).toFixed(1) : 0;
@@ -115,9 +147,21 @@ const AnalysisPage = ({ productionData = {} }) => {
         });
       });
       
+      // Subtract renewable energy reduction for this month
+      const renewableData = getRenewableEnergyData();
+      let monthlyRenewableReduction = 0;
+      renewableData.forEach(project => {
+        if (project.monthlyData && project.monthlyData[monthKey]) {
+          const monthlyGeneration = parseFloat(project.monthlyData[monthKey]) || 0;
+          monthlyRenewableReduction += monthlyGeneration * 1; // 1 tCO₂/MWh
+        }
+      });
+      
+      const netEmissions = Math.max(0, monthlyEmissions - monthlyRenewableReduction);
+      
       return {
         month: monthLabels[index],
-        emissions: monthlyEmissions.toFixed(2)
+        emissions: netEmissions.toFixed(2)
       };
     });
   };
@@ -293,6 +337,12 @@ const AnalysisPage = ({ productionData = {} }) => {
           </div>
           <p className="text-3xl font-bold text-gray-900">{totalEmissions.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
           <p className="text-xs text-gray-500 mt-1">tCO₂e</p>
+          {renewableReduction > 0 && (
+            <div className="mt-2 text-xs">
+              <p className="text-gray-600">Gross: {grossTotalEmissions.toFixed(2)} tCO₂e</p>
+              <p className="text-green-600">Renewable reduction: -{renewableReduction.toFixed(2)} tCO₂e</p>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6">

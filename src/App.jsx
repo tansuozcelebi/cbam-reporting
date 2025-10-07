@@ -10,6 +10,7 @@ import ResultsPage from './components/ResultsPage';
 import AnalysisPage from './components/AnalysisPage';
 import ProductionPage from './components/ProductionPage';
 import RenewableEnergyPage from './components/RenewableEnergyPage';
+import AboutCBAM from './components/AboutCBAM';
 
 // Context for app state
 export const AppContext = createContext();
@@ -248,6 +249,7 @@ const App = () => {
             {currentPage === 'renewable' && <RenewableEnergyPage t={t} />}
             {currentPage === 'results' && <ResultsPage />}
             {currentPage === 'analysis' && <AnalysisPage productionData={productionData} />}
+            {currentPage === 'aboutCBAM' && <AboutCBAM />}
           </main>
         </div>
       </div>

@@ -21,7 +21,7 @@ export const translations = {
     fuel: "Diesel",
     production: "Production",
     renewableElectricity: "Renewable Electricity Generation",
-    renewableEnergy: "Renewable Energy",
+    renewableEnergy: "Generated Renewable Energy",
     addEntry: "Add Entry",
     addFirstEntry: "Add First Entry",
     saveAll: "Save All",
@@ -137,7 +137,100 @@ export const translations = {
     carbonPerKg: "Carbon per kg",
     emissionsPerKg: "Emissions per kg of production",
     productionAnalysisNote: "This data will be used to calculate carbon emissions per kg on the Analysis page.",
-    totalEmissionsFormula: "Total Emissions ÷ Annual Production × 1000"
+    totalEmissionsFormula: "Total Emissions ÷ Annual Production × 1000",
+    renewableReductionNote: "Generated renewable energy reduces total emissions by 1 tCO₂/MWh",
+    grossEmissions: "Gross Emissions",
+    renewableReduction: "Renewable Energy Reduction",
+    netEmissions: "Net Emissions",
+    
+    // About CBAM translations
+    aboutCBAM: "About CBAM",
+    aboutCBAMTitle: "About Carbon Border Adjustment Mechanism (CBAM)",
+    aboutCBAMDescription: "Comprehensive information about the European Union's Carbon Border Adjustment Mechanism and its implementation.",
+    
+    whatIsCBAM: "What is CBAM?",
+    cbamDefinition: "The Carbon Border Adjustment Mechanism (CBAM) is a pioneering policy tool implemented by the European Union to address carbon leakage and ensure that the EU's climate objectives are not undermined by imports from countries with less ambitious climate policies.",
+    cbamPurpose: "CBAM puts a carbon price on imports of certain goods from outside the EU, ensuring that EU climate action is not undermined by carbon leakage. It incentivizes cleaner production in exporting countries and protects EU industry that is transitioning to greener processes.",
+    
+    keyObjectives: "Key Objectives",
+    objective1: "Prevent carbon leakage by ensuring imported goods face similar carbon costs as EU-produced goods",
+    objective2: "Protect EU businesses that are investing in clean technologies from unfair competition",
+    objective3: "Encourage trading partners to step up their own climate action and carbon pricing mechanisms",
+    
+    coveredSectors: "Covered Sectors and Products",
+    sectorsIntro: "CBAM initially covers the most carbon-intensive sectors where the risk of carbon leakage is highest:",
+    initialSectors: "Initial Coverage (2023-2026)",
+    sector1: "Cement - Including Portland cement, aluminous cement, and other hydraulic cements",
+    sector2: "Iron and Steel - Pig iron, cast iron, crude steel, and various steel products",
+    sector3: "Aluminum - Primary aluminum, aluminum alloys, and aluminum waste and scrap",
+    sector4: "Fertilizers - Ammonia, nitrates, phosphates, and complex fertilizers",
+    sector5: "Electricity - Direct import of electricity from third countries",
+    
+    plannedExpansion: "Planned Expansion",
+    expansion1: "Chemicals and petrochemicals sector",
+    expansion2: "Hydrogen and hydrogen-based products",
+    expansion3: "Additional downstream products in covered sectors",
+    
+    howCBAMWorks: "How CBAM Works",
+    cbamMechanism: "CBAM operates through a certificate-based system where EU importers must purchase CBAM certificates corresponding to the carbon price that would have been paid if the goods had been produced under EU climate rules.",
+    
+    cbamCertificates: "CBAM Certificates",
+    certificatesExplanation: "EU importers will need to purchase CBAM certificates to cover the emissions embedded in their imports. The price of these certificates will be calculated based on the weekly average auction price of EU ETS allowances expressed in euros per tonne of CO₂ emitted.",
+    
+    carbonContent: "Determining Carbon Content",
+    carbonContentExplanation: "Importers must report the actual embedded emissions in their imports. If actual emissions cannot be determined, default values based on the average emission intensity of each exporting country will be applied. This creates incentives for cleaner production methods.",
+    
+    importantNote: "Important Note",
+    priceCalculation: "The CBAM price takes into account any carbon price paid in the country of origin for the embedded emissions, ensuring no double taxation while maintaining environmental integrity.",
+    
+    implementationTimeline: "Implementation Timeline",
+    transitionalPeriod: "Transitional Period (2023-2026)",
+    transitionalDetails: "During this phase, importers only need to report the embedded emissions in their imports without financial obligations. This allows time for adaptation and system refinement.",
+    
+    fullImplementation: "Full Implementation (2027 onwards)",
+    fullImplementationDetails: "From 2027, importers will be required to purchase and surrender CBAM certificates corresponding to the carbon price that would have been paid if goods were produced under EU climate rules.",
+    
+    futureExpansion: "Future Expansion (Post-2030)",
+    futureExpansionDetails: "The European Commission will assess the possibility of extending CBAM to other sectors and including indirect emissions, potentially covering the entire economy by 2030.",
+    
+    reportingRequirements: "Reporting Requirements",
+    reportingIntro: "Under CBAM, importers must provide detailed information about their imports and their embedded emissions:",
+    
+    requiredInformation: "Required Information",
+    requirement1: "Total quantity of goods imported in tonnes",
+    requirement2: "Actual embedded emissions or default values per tonne of goods",
+    requirement3: "Carbon price paid in the country of origin",
+    requirement4: "Production processes and any relevant certificates",
+    requirement5: "Installation-specific data when available",
+    
+    reportingFrequency: "Reporting Frequency",
+    frequencyDetails: "Reports must be submitted quarterly during the transitional period, with detailed verification requirements. The European Commission provides templates and guidance documents to ensure consistent reporting across all member states.",
+    
+    climateGoals: "EU Climate Goals and Context",
+    climateGoalsIntro: "CBAM is part of the European Green Deal and the 'Fit for 55' package, designed to achieve the EU's ambitious climate targets:",
+    
+    emissionReduction2030: "Emission reduction by 2030 compared to 1990 levels",
+    climatNeutrality: "Target year for climate neutrality",
+    greenDealInvestment: "Estimated investment needed for green transition",
+    
+    references: "References and Further Information",
+    officialEULegislation: "Official EU Legislation",
+    cbamRegulation: "Regulation (EU) 2023/956 - CBAM Regulation",
+    
+    euCommissionCBAM: "European Commission CBAM Information",
+    commissionWebsite: "Official CBAM Implementation Website",
+    
+    europeanGreenDeal: "European Green Deal",
+    greenDealWebsite: "Green Deal Strategy and Policies",
+    
+    etsInformation: "EU Emissions Trading System",
+    etsWebsite: "ETS Information and Carbon Pricing",
+    
+    academicResources: "Academic and General Resources",
+    wikipediaCBAM: "Carbon Border Adjustment - Wikipedia",
+    
+    disclaimerTitle: "Disclaimer",
+    disclaimerText: "This information is provided for educational purposes only and should not be considered as legal or regulatory advice. Always consult official EU sources and qualified professionals for compliance guidance. Information is current as of 2024 and subject to regulatory updates."
   },
   de: {
     appName: "CBAM EU-Export-Reporter",
@@ -161,7 +254,7 @@ export const translations = {
     fuel: "Diesel",
     production: "Produktion",
     renewableElectricity: "Erneuerbare Stromerzeugung",
-    renewableEnergy: "Erneuerbare Energie",
+    renewableEnergy: "Erzeugte Erneuerbare Energie",
     addEntry: "Eintrag hinzufügen",
     addFirstEntry: "Ersten Eintrag hinzufügen",
     saveAll: "Alle speichern",
@@ -277,7 +370,100 @@ export const translations = {
     carbonPerKg: "Kohlenstoff pro kg",
     emissionsPerKg: "Emissionen pro kg Produktion",
     productionAnalysisNote: "Diese Daten werden zur Berechnung der Kohlenstoffemissionen pro kg auf der Analysenseite verwendet.",
-    totalEmissionsFormula: "Gesamtemissionen ÷ Jahresproduktion × 1000"
+    totalEmissionsFormula: "Gesamtemissionen ÷ Jahresproduktion × 1000",
+    renewableReductionNote: "Erzeugte erneuerbare Energie reduziert Gesamtemissionen um 1 tCO₂/MWh",
+    grossEmissions: "Bruttoemissionen",
+    renewableReduction: "Erneuerbare Energie Reduktion",
+    netEmissions: "Nettoemissionen",
+    
+    // About CBAM translations
+    aboutCBAM: "Über CBAM",
+    aboutCBAMTitle: "Über den CO₂-Grenzausgleichsmechanismus (CBAM)",
+    aboutCBAMDescription: "Umfassende Informationen über den CO₂-Grenzausgleichsmechanismus der Europäischen Union und dessen Umsetzung.",
+    
+    whatIsCBAM: "Was ist CBAM?",
+    cbamDefinition: "Der CO₂-Grenzausgleichsmechanismus (CBAM) ist ein wegweisendes politisches Instrument der Europäischen Union zur Bekämpfung von Carbon Leakage und um sicherzustellen, dass die EU-Klimaziele nicht durch Importe aus Ländern mit weniger ehrgeizigen Klimapolitiken untergraben werden.",
+    cbamPurpose: "CBAM legt einen CO₂-Preis auf Importe bestimmter Waren von außerhalb der EU fest und stellt sicher, dass EU-Klimamaßnahmen nicht durch Carbon Leakage untergraben werden. Es schafft Anreize für sauberere Produktion in Exportländern und schützt EU-Industrien beim Übergang zu grüneren Verfahren.",
+    
+    keyObjectives: "Hauptziele",
+    objective1: "Verhinderung von Carbon Leakage durch ähnliche CO₂-Kosten für importierte wie für EU-produzierte Waren",
+    objective2: "Schutz von EU-Unternehmen, die in saubere Technologien investieren, vor unfairem Wettbewerb",
+    objective3: "Ermutigung der Handelspartner, ihre eigenen Klimaschutzmaßnahmen zu verstärken",
+    
+    coveredSectors: "Abgedeckte Sektoren und Produkte",
+    sectorsIntro: "CBAM deckt zunächst die kohlenstoffintensivsten Sektoren mit dem höchsten Carbon-Leakage-Risiko ab:",
+    initialSectors: "Anfängliche Abdeckung (2023-2026)",
+    sector1: "Zement - Einschließlich Portlandzement, Tonerdezement und andere hydraulische Zemente",
+    sector2: "Eisen und Stahl - Roheisen, Gusseisen, Rohstahl und verschiedene Stahlprodukte",
+    sector3: "Aluminium - Primäraluminium, Aluminiumlegierungen und Aluminiumabfälle",
+    sector4: "Düngemittel - Ammoniak, Nitrate, Phosphate und komplexe Düngemittel",
+    sector5: "Elektrizität - Direktimport von Strom aus Drittländern",
+    
+    plannedExpansion: "Geplante Erweiterung",
+    expansion1: "Chemie- und Petrochemiesektor",
+    expansion2: "Wasserstoff und wasserstoffbasierte Produkte",
+    expansion3: "Zusätzliche nachgelagerte Produkte in abgedeckten Sektoren",
+    
+    howCBAMWorks: "Wie CBAM funktioniert",
+    cbamMechanism: "CBAM funktioniert über ein zertifikatsbasiertes System, bei dem EU-Importeure CBAM-Zertifikate kaufen müssen, die dem CO₂-Preis entsprechen, der gezahlt worden wäre, wenn die Waren unter EU-Klimaregeln produziert worden wären.",
+    
+    cbamCertificates: "CBAM-Zertifikate",
+    certificatesExplanation: "EU-Importeure müssen CBAM-Zertifikate kaufen, um die in ihren Importen eingebetteten Emissionen abzudecken. Der Preis dieser Zertifikate wird basierend auf dem wöchentlichen Durchschnittspreis von EU-ETS-Zertifikaten berechnet.",
+    
+    carbonContent: "Bestimmung des Kohlenstoffgehalts",
+    carbonContentExplanation: "Importeure müssen die tatsächlichen eingebetteten Emissionen ihrer Importe melden. Wenn tatsächliche Emissionen nicht bestimmt werden können, werden Standardwerte basierend auf der durchschnittlichen Emissionsintensität jedes Exportlandes angewendet.",
+    
+    importantNote: "Wichtiger Hinweis",
+    priceCalculation: "Der CBAM-Preis berücksichtigt jeden CO₂-Preis, der im Ursprungsland für die eingebetteten Emissionen gezahlt wurde, um Doppelbesteuerung zu vermeiden.",
+    
+    implementationTimeline: "Umsetzungszeitplan",
+    transitionalPeriod: "Übergangsphase (2023-2026)",
+    transitionalDetails: "Während dieser Phase müssen Importeure nur die eingebetteten Emissionen ihrer Importe melden, ohne finanzielle Verpflichtungen.",
+    
+    fullImplementation: "Vollständige Umsetzung (ab 2027)",
+    fullImplementationDetails: "Ab 2027 müssen Importeure CBAM-Zertifikate kaufen und abgeben, die dem CO₂-Preis entsprechen, der unter EU-Klimaregeln gezahlt worden wäre.",
+    
+    futureExpansion: "Zukünftige Erweiterung (nach 2030)",
+    futureExpansionDetails: "Die Europäische Kommission wird die Möglichkeit einer Ausdehnung von CBAM auf andere Sektoren und indirekte Emissionen bewerten.",
+    
+    reportingRequirements: "Berichtspflichten",
+    reportingIntro: "Unter CBAM müssen Importeure detaillierte Informationen über ihre Importe und deren eingebettete Emissionen bereitstellen:",
+    
+    requiredInformation: "Erforderliche Informationen",
+    requirement1: "Gesamtmenge der importierten Waren in Tonnen",
+    requirement2: "Tatsächliche eingebettete Emissionen oder Standardwerte pro Tonne Waren",
+    requirement3: "Im Ursprungsland gezahlter CO₂-Preis",
+    requirement4: "Produktionsprozesse und relevante Zertifikate",
+    requirement5: "Anlagenspezifische Daten, wenn verfügbar",
+    
+    reportingFrequency: "Berichtshäufigkeit",
+    frequencyDetails: "Berichte müssen während der Übergangsphase vierteljährlich eingereicht werden, mit detaillierten Verifizierungsanforderungen.",
+    
+    climateGoals: "EU-Klimaziele und Kontext",
+    climateGoalsIntro: "CBAM ist Teil des Europäischen Green Deal und des 'Fit for 55'-Pakets zur Erreichung ehrgeiziger EU-Klimaziele:",
+    
+    emissionReduction2030: "Emissionsreduktion bis 2030 im Vergleich zu 1990",
+    climatNeutrality: "Zieljahr für Klimaneutralität",
+    greenDealInvestment: "Geschätzte Investition für grünen Wandel",
+    
+    references: "Referenzen und weitere Informationen",
+    officialEULegislation: "Offizielle EU-Gesetzgebung",
+    cbamRegulation: "Verordnung (EU) 2023/956 - CBAM-Verordnung",
+    
+    euCommissionCBAM: "Europäische Kommission CBAM-Informationen",
+    commissionWebsite: "Offizielle CBAM-Umsetzungswebsite",
+    
+    europeanGreenDeal: "Europäischer Green Deal",
+    greenDealWebsite: "Green Deal Strategie und Politiken",
+    
+    etsInformation: "EU-Emissionshandelssystem",
+    etsWebsite: "ETS-Informationen und CO₂-Preisgestaltung",
+    
+    academicResources: "Akademische und allgemeine Ressourcen",
+    wikipediaCBAM: "CO₂-Grenzausgleich - Wikipedia",
+    
+    disclaimerTitle: "Haftungsausschluss",
+    disclaimerText: "Diese Informationen dienen nur zu Bildungszwecken und sollten nicht als Rechts- oder Regulierungsberatung betrachtet werden. Konsultieren Sie immer offizielle EU-Quellen und qualifizierte Fachleute."
   },
   tr: {
     appName: "CBAM AB İhracat Raporlayıcı",
@@ -301,7 +487,7 @@ export const translations = {
     fuel: "Dizel",
     production: "Üretim",
     renewableElectricity: "Yenilenebilir Elektrik Üretimi",
-    renewableEnergy: "Yenilenebilir Enerji",
+    renewableEnergy: "Üretilen Yenilenebilir Enerji",
     addEntry: "Girdi Ekle",
     addFirstEntry: "İlk Girdiyi Ekle",
     saveAll: "Tümünü Kaydet",
@@ -417,7 +603,11 @@ export const translations = {
     carbonPerKg: "Kg başına karbon",
     emissionsPerKg: "Kg üretim başına emisyonlar",
     productionAnalysisNote: "Bu veriler Analiz sayfasında kg başına karbon salınımı hesaplamak için kullanılacaktır.",
-    totalEmissionsFormula: "Toplam Emisyonlar ÷ Yıllık Üretim × 1000"
+    totalEmissionsFormula: "Toplam Emisyonlar ÷ Yıllık Üretim × 1000",
+    renewableReductionNote: "Üretilen yenilenebilir enerji toplam emisyonları 1 tCO₂/MWh azaltır",
+    grossEmissions: "Brüt Emisyonlar",
+    renewableReduction: "Yenilenebilir Enerji Azaltması",
+    netEmissions: "Net Emisyonlar"
   },
   
   // French
