@@ -17,9 +17,12 @@ const AboutCBAM = () => {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-3">
           <BookOpen className="text-blue-600" size={32} />
-          {t.aboutCBAMTitle}
+          <div className="flex flex-col">
+            <span>About Carbon Border Adjustment Mechanism (CBAM)</span>
+            <span className="text-2xl text-gray-600 font-medium">Reporting for EU Exports</span>
+          </div>
         </h1>
-        <p className="text-gray-600 text-lg">{t.aboutCBAMDescription}</p>
+        <p className="text-gray-600 mb-8 text-sm">{t.aboutCBAMDescription}</p>
       </div>
 
       {/* Section 1: What is CBAM */}

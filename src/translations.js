@@ -123,6 +123,7 @@ export const translations = {
     dataSessionNote: "Your data will be saved during this session. Use the same email to access your data after logout.",
     demoAccounts: "Demo accounts:",
     emailValidation: "Please enter a valid email address",
+    sessionInfo: "Session Information",
     
     // Production related
     monthlyProduction: "Monthly Production",
@@ -356,6 +357,7 @@ export const translations = {
     dataSessionNote: "Ihre Daten werden während dieser Sitzung gespeichert. Verwenden Sie dieselbe E-Mail, um nach dem Abmelden auf Ihre Daten zuzugreifen.",
     demoAccounts: "Demo-Konten:",
     emailValidation: "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+    sessionInfo: "Sitzungsinformationen",
     
     // Production related
     monthlyProduction: "Monatliche Produktion",
@@ -589,6 +591,7 @@ export const translations = {
     dataSessionNote: "Verileriniz bu oturum boyunca kaydedilecektir. Çıkış yaptıktan sonra verilerinize erişmek için aynı e-postayı kullanın.",
     demoAccounts: "Demo hesaplar:",
     emailValidation: "Lütfen geçerli bir e-posta adresi girin",
+    sessionInfo: "Oturum Bilgileri",
     
     // Production related
     monthlyProduction: "Aylık Üretim",
@@ -607,7 +610,96 @@ export const translations = {
     renewableReductionNote: "Üretilen yenilenebilir enerji toplam emisyonları 1 tCO₂/MWh azaltır",
     grossEmissions: "Brüt Emisyonlar",
     renewableReduction: "Yenilenebilir Enerji Azaltması",
-    netEmissions: "Net Emisyonlar"
+    netEmissions: "Net Emisyonlar",
+    
+    // About CBAM translations
+    aboutCBAM: "CBAM Hakkında",
+    aboutCBAMTitle: "Karbon Sınır Düzenleme Mekanizması (CBAM) Hakkında",
+    aboutCBAMDescription: "Avrupa Birliği'nin Karbon Sınır Düzenleme Mekanizması ve uygulaması hakkında kapsamlı bilgiler.",
+    
+    whatIsCBAM: "CBAM Nedir?",
+    cbamDefinition: "Karbon Sınır Düzenleme Mekanizması (CBAM), Avrupa Birliği tarafından uygulanan öncü bir politika aracıdır. Karbon sızıntısını ele almak ve AB'nin iklim hedeflerinin daha az iddialı iklim politikaları olan ülkelerden gelen ithalatlarla baltalanmamasını sağlamak için tasarlanmıştır.",
+    cbamPurpose: "CBAM, AB dışından belirli mallara karbon fiyatı koyarak AB iklim eyleminin karbon sızıntısıyla baltalanmamasını sağlar. İhracatçı ülkelerde daha temiz üretimi teşvik eder ve daha yeşil süreçlere geçiş yapan AB sanayisini korur.",
+    
+    keyObjectives: "Temel Hedefler",
+    objective1: "İthal malların AB'de üretilen mallarla benzer karbon maliyetlerine tabi tutularak karbon sızıntısını önlemek",
+    objective2: "Temiz teknolojilere yatırım yapan AB işletmelerini haksız rekabetten korumak",
+    objective3: "Ticaret ortaklarını kendi iklim eylemlerini ve karbon fiyatlandırma mekanizmalarını güçlendirmeye teşvik etmek",
+    
+    coveredSectors: "Kapsanan Sektörler ve Ürünler",
+    sectorsIntro: "CBAM başlangıçta karbon sızıntısı riski en yüksek olan en karbon yoğun sektörleri kapsar:",
+    initialSectors: "Başlangıç Kapsamı (2023-2026)",
+    sector1: "Çimento - Portland çimentosu, alüminli çimento ve diğer hidrolik çimentolar dahil",
+    sector2: "Demir ve Çelik - Ham demir, dökme demir, ham çelik ve çeşitli çelik ürünleri",
+    sector3: "Alüminyum - Birincil alüminyum, alüminyum alaşımları ve alüminyum atık ve hurdası",
+    sector4: "Gübreler - Amonyak, nitratlar, fosfatlar ve kompleks gübreler",
+    sector5: "Elektrik - Üçüncü ülkelerden doğrudan elektrik ithalatı",
+    
+    plannedExpansion: "Planlanan Genişleme",
+    expansion1: "Kimya ve petrokimya sektörü",
+    expansion2: "Hidrojen ve hidrojen bazlı ürünler",
+    expansion3: "Kapsanan sektörlerdeki ek hilir ürünler",
+    
+    howCBAMWorks: "CBAM Nasıl Çalışır",
+    cbamMechanism: "CBAM, AB ithalatçılarının malları AB iklim kuralları altında üretilseydi ödenecek olan karbon fiyatına karşılık gelen CBAM sertifikaları satın alması gereken sertifika tabanlı bir sistem aracılığıyla çalışır.",
+    
+    cbamCertificates: "CBAM Sertifikaları",
+    certificatesExplanation: "AB ithalatçıları, ithalatlarına gömülü emisyonları karşılamak için CBAM sertifikaları satın almalıdır. Bu sertifikaların fiyatı, AB ETS tahsis birimlerinin haftalık ortalama müzayede fiyatına göre hesaplanacaktır.",
+    
+    carbonContent: "Karbon İçeriğinin Belirlenmesi",
+    carbonContentExplanation: "İthalatçılar ithalatlarındaki gerçek gömülü emisyonları rapor etmelidir. Gerçek emisyonlar belirlenemezse, her ihracatçı ülkenin ortalama emisyon yoğunluğuna dayalı varsayılan değerler uygulanacaktır.",
+    
+    importantNote: "Önemli Not",
+    priceCalculation: "CBAM fiyatı, gömülü emisyonlar için menşe ülkesinde ödenen herhangi bir karbon fiyatını dikkate alarak çifte vergilendirmeyi önlerken çevresel bütünlüğü korur.",
+    
+    implementationTimeline: "Uygulama Takvimi",
+    transitionalPeriod: "Geçiş Dönemi (2023-2026)",
+    transitionalDetails: "Bu aşamada ithalatçılar yalnızca ithalatlarındaki gömülü emisyonları mali yükümlülük olmaksızın rapor etmelidir.",
+    
+    fullImplementation: "Tam Uygulama (2027 sonrası)",
+    fullImplementationDetails: "2027'den itibaren ithalatçılar, malların AB iklim kuralları altında üretilmesi durumunda ödenecek karbon fiyatına karşılık gelen CBAM sertifikalarını satın almak ve teslim etmek zorunda kalacaktır.",
+    
+    futureExpansion: "Gelecek Genişleme (2030 sonrası)",
+    futureExpansionDetails: "Avrupa Komisyonu, CBAM'ın diğer sektörlere genişletilmesi ve dolaylı emisyonları dahil etme olasılığını değerlendirecektir.",
+    
+    reportingRequirements: "Raporlama Gereksinimleri",
+    reportingIntro: "CBAM kapsamında ithalatçılar ithalatları ve gömülü emisyonları hakkında ayrıntılı bilgi vermelidir:",
+    
+    requiredInformation: "Gerekli Bilgiler",
+    requirement1: "İthal edilen malların ton cinsinden toplam miktarı",
+    requirement2: "Gerçek gömülü emisyonlar veya mal başına ton başına varsayılan değerler",
+    requirement3: "Menşe ülkesinde ödenen karbon fiyatı",
+    requirement4: "Üretim süreçleri ve ilgili sertifikalar",
+    requirement5: "Mevcut olduğunda tesis özel verileri",
+    
+    reportingFrequency: "Raporlama Sıklığı",
+    frequencyDetails: "Geçiş döneminde raporlar üç ayda bir sunulmalıdır ve ayrıntılı doğrulama gereksinimleri vardır.",
+    
+    climateGoals: "AB İklim Hedefleri ve Bağlam",
+    climateGoalsIntro: "CBAM, Avrupa Yeşil Mutabakatı ve 'Fit for 55' paketinin bir parçasıdır ve AB'nin iddialı iklim hedeflerine ulaşmak için tasarlanmıştır:",
+    
+    emissionReduction2030: "1990 seviyelerine göre 2030'a kadar emisyon azaltımı",
+    climatNeutrality: "İklim nötrlüğü hedef yılı",
+    greenDealInvestment: "Yeşil dönüşüm için tahmini yatırım",
+    
+    references: "Referanslar ve Ek Bilgiler",
+    officialEULegislation: "Resmi AB Mevzuatı",
+    cbamRegulation: "Yönetmelik (AB) 2023/956 - CBAM Yönetmeliği",
+    
+    euCommissionCBAM: "Avrupa Komisyonu CBAM Bilgileri",
+    commissionWebsite: "Resmi CBAM Uygulama Web Sitesi",
+    
+    europeanGreenDeal: "Avrupa Yeşil Mutabakatı",
+    greenDealWebsite: "Yeşil Mutabakat Stratejisi ve Politikaları",
+    
+    etsInformation: "AB Emisyon Ticaret Sistemi",
+    etsWebsite: "ETS Bilgileri ve Karbon Fiyatlandırması",
+    
+    academicResources: "Akademik ve Genel Kaynaklar",
+    wikipediaCBAM: "Karbon Sınır Düzenlemesi - Wikipedia",
+    
+    disclaimerTitle: "Sorumluluk Reddi",
+    disclaimerText: "Bu bilgiler yalnızca eğitim amaçlıdır ve hukuki veya düzenleyici tavsiye olarak değerlendirilmemelidir. Uyum rehberliği için her zaman resmi AB kaynaklarına ve nitelikli profesyonellere danışın."
   },
   
   // French

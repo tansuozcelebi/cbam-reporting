@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Info, HelpCircle, X, ExternalLink } from 'lucide-react';
+import { Info, HelpCircle, X, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 
 const LoginPage = ({ onLogin, language, setLanguage, t }) => {
   const [email, setEmail] = useState('');
@@ -8,6 +8,7 @@ const LoginPage = ({ onLogin, language, setLanguage, t }) => {
   const [isLanguageDropdownOpen, setIsLanguageDropdownOpen] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showInfoAccordion, setShowInfoAccordion] = useState(false);
   const [currentVideo, setCurrentVideo] = useState('');
   const dropdownRef = useRef(null);
 
@@ -229,13 +230,36 @@ const LoginPage = ({ onLogin, language, setLanguage, t }) => {
           >
             {t.signIn}
           </button>
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-xs text-blue-800">
-              <strong>ℹ️ {t.noteLabel}</strong> {t.dataSessionNote}
-            </p>
-            <p className="text-xs text-blue-600 mt-1">
-              <strong>{t.demoAccounts}</strong> test@acme.com, user@company.com, admin@cbam.eu
-            </p>
+          <div className="mt-4 border border-blue-200 rounded-lg overflow-hidden">
+            {/* Accordion Header */}
+            <button
+              onClick={() => setShowInfoAccordion(!showInfoAccordion)}
+              className="w-full flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <Info size={16} className="text-blue-600" />
+                <span className="text-sm font-medium text-blue-800">
+                  {t.sessionInfo || 'Session Information'}
+                </span>
+              </div>
+              {showInfoAccordion ? (
+                <ChevronUp size={16} className="text-blue-600" />
+              ) : (
+                <ChevronDown size={16} className="text-blue-600" />
+              )}
+            </button>
+            
+            {/* Accordion Content */}
+            {showInfoAccordion && (
+              <div className="p-3 bg-white border-t border-blue-200">
+                <p className="text-xs text-blue-800 mb-2">
+                  <strong>ℹ️ {t.noteLabel}</strong> {t.dataSessionNote}
+                </p>
+                <p className="text-xs text-blue-600">
+                  <strong>{t.demoAccounts}</strong> test@acme.com, user@company.com, admin@cbam.eu
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Version and Help Section */}
