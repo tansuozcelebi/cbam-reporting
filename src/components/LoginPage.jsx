@@ -5,20 +5,60 @@ const LoginPage = ({ onLogin, language, setLanguage, t }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = () => {
+  // European languages with flags (abbreviated for login)
+  const languages = [
+    { code: 'en', name: '🇬🇧 EN' },
+    { code: 'de', name: '🇩🇪 DE' },
+    { code: 'tr', name: '🇹🇷 TR' },
+    { code: 'fr', name: '🇫🇷 FR' },
+    { code: 'es', name: '🇪🇸 ES' },
+    { code: 'it', name: '🇮🇹 IT' },
+    { code: 'nl', name: '🇳🇱 NL' },
+    { code: 'pt', name: '🇵🇹 PT' },
+    { code: 'pl', name: '🇵🇱 PL' },
+    { code: 'sv', name: '🇸🇪 SV' },
+    { code: 'da', name: '🇩🇰 DA' },
+    { code: 'no', name: '🇳🇴 NO' },
+    { code: 'fi', name: '🇫🇮 FI' },
+    { code: 'cs', name: '🇨🇿 CS' },
+    { code: 'sk', name: '🇸🇰 SK' },
+    { code: 'hu', name: '🇭🇺 HU' },
+    { code: 'ro', name: '🇷🇴 RO' },
+    { code: 'bg', name: '🇧🇬 BG' },
+    { code: 'hr', name: '🇭🇷 HR' },
+    { code: 'sl', name: '🇸🇮 SI' },
+    { code: 'lt', name: '🇱🇹 LT' },
+    { code: 'lv', name: '🇱🇻 LV' },
+    { code: 'et', name: '🇪🇪 ET' },
+    { code: 'mt', name: '🇲🇹 MT' },
+    { code: 'ga', name: '🇮🇪 GA' },
+    { code: 'cy', name: '🏴󠁧󠁢󠁷󠁬󠁳󠁿 CY' }
+  ];
+
+  const handleLogin = async () => {
+    console.log('LoginPage handleLogin clicked!');
     setError('');
     
     if (!email || !password) {
+      console.log('Email or password missing:', email, password);
       setError(t.requiredField);
       return;
     }
     
     if (!email.includes('@')) {
+      console.log('Invalid email format:', email);
       setError(t.emailValidation);
       return;
     }
     
-    onLogin(email, password);
+    console.log('About to call onLogin with:', email, password);
+    try {
+      await onLogin(email, password);
+      console.log('onLogin completed successfully');
+    } catch (error) {
+      console.error('Login error in LoginPage:', error);
+      setError('Login failed. Please try again.');
+    }
   };
 
   const handleKeyPress = (e) => {
@@ -44,11 +84,13 @@ const LoginPage = ({ onLogin, language, setLanguage, t }) => {
           <select 
             value={language} 
             onChange={(e) => setLanguage(e.target.value)}
-            className="border rounded px-2 py-1 text-sm"
+            className="border rounded px-2 py-1 text-sm min-w-[80px]"
           >
-            <option value="en">EN</option>
-            <option value="de">DE</option>
-            <option value="tr">TR</option>
+            {languages.map(lang => (
+              <option key={lang.code} value={lang.code}>
+                {lang.name}
+              </option>
+            ))}
           </select>
         </div>
         <h1 className="text-xl font-bold text-gray-800 mb-2">{t.appName}</h1>

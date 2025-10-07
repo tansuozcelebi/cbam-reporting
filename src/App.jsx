@@ -46,35 +46,31 @@ const App = () => {
     isLoading 
   } = useDatabase();
 
-  const t = translations[language];
+  // Translation with fallback to English
+  const t = new Proxy(translations[language] || translations.en, {
+    get: (target, prop) => {
+      return target[prop] || translations.en[prop] || prop;
+    }
+  });
 
-  const handleLogin = (email, password) => {
-    const userName = email.split('@')[0];
-    setUser({ name: userName, email });
-    
-    // Load user's data if exists
-    if (allUserData[email]) {
-      setEntries(allUserData[email].entries || {
-        electricity: [],
-        naturalGas: [],
-        fuel: [],
-        cars: [],
-        flights: [],
-        publicTransport: [],
-        refrigerants: [],
-        remoteWorking: []
-      });
-      setProductionData(allUserData[email].productionData || {
-        monthlyProduction: {
-          jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
-          jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
-        },
-        year: new Date().getFullYear()
-      });
-    } else {
-      // Initialize empty data for new user
-      const emptyData = {
-        entries: {
+  const handleLogin = async (email, password) => {
+    console.log('Login attempt:', email, password);
+    try {
+      const userName = email.split('@')[0];
+      console.log('Processing login for:', userName);
+      
+      // Try to login user and get user data from database
+      const userData = await loginUser(email, password);
+      console.log('User data from DB:', userData);
+      
+      if (userData) {
+        // User exists in database, load their data
+        setUser({ id: userData.id, name: userName, email });
+        console.log('Existing user logged in');
+        
+        // Load entries from database
+        const userEntries = await loadEntriesFromDB(userData.id);
+        setEntries(userEntries || {
           electricity: [],
           naturalGas: [],
           fuel: [],
@@ -83,24 +79,53 @@ const App = () => {
           publicTransport: [],
           refrigerants: [],
           remoteWorking: []
-        },
-        productionData: {
+        });
+        
+        // Load production data from database
+        const userProductionData = await loadProductionFromDB(userData.id);
+        setProductionData(userProductionData || {
           monthlyProduction: {
             jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
             jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
           },
           year: new Date().getFullYear()
-        }
-      };
-      setEntries(emptyData.entries);
-      setProductionData(emptyData.productionData);
-      setAllUserData(prev => ({
-        ...prev,
-        [email]: emptyData
-      }));
+        });
+      } else {
+        // New user - create account and initialize empty data
+        const newUserId = Date.now(); // Simple ID generation
+        setUser({ id: newUserId, name: userName, email });
+        console.log('New user created with ID:', newUserId);
+        
+        // Initialize empty data structures
+        const emptyEntries = {
+          electricity: [],
+          naturalGas: [],
+          fuel: [],
+          cars: [],
+          flights: [],
+          publicTransport: [],
+          refrigerants: [],
+          remoteWorking: []
+        };
+        
+        const emptyProductionData = {
+          monthlyProduction: {
+            jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
+            jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
+          },
+          year: new Date().getFullYear()
+        };
+        
+        setEntries(emptyEntries);
+        setProductionData(emptyProductionData);
+      }
+      
+      console.log('Setting logged in to true');
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Login failed. Please try again.');
     }
-    
-    setIsLoggedIn(true);
   };
 
   const handleLogout = async () => {
@@ -115,15 +140,22 @@ const App = () => {
   };
 
   const handleProductionDataChange = async (type, data) => {
+    console.log('🏭 handleProductionDataChange called with:', type, data);
+    
     if (type === 'production' && user?.id) {
+      console.log('💾 About to save production data for user:', user.id);
       setProductionData(data);
       
       // Save to database
       try {
+        console.log('📤 Calling saveProductionToDB with:', user.id, data.monthlyProduction);
         await saveProductionToDB(user.id, data.monthlyProduction || {});
+        console.log('✅ Production data saved successfully to database');
       } catch (error) {
-        console.error('Failed to save production data:', error);
+        console.error('❌ Failed to save production data:', error);
       }
+    } else {
+      console.log('⚠️ Production data not saved - missing user ID or wrong type:', { type, userId: user?.id });
     }
   };
 

@@ -11,15 +11,19 @@ export const useDatabase = () => {
     setError(null);
     
     try {
+      console.log('useDatabase loginUser called with:', email);
       const userName = email.split('@')[0];
-      const user = dbService.createUser(email, userName);
+      const user = await dbService.createUser(email, userName);
+      console.log('User created/found:', user);
       
       // Load user settings
-      const settings = dbService.getUserSettings(user.id);
+      const settings = await dbService.getUserSettings(user.id);
+      console.log('User settings loaded:', settings);
       
       setIsLoading(false);
-      return { user, settings };
+      return { id: user.id, email: user.email, name: user.name, settings };
     } catch (err) {
+      console.error('loginUser error:', err);
       setError(err.message);
       setIsLoading(false);
       throw err;
@@ -74,14 +78,18 @@ export const useDatabase = () => {
 
   // Production data operations
   const saveProductionData = useCallback(async (userId, monthlyProduction) => {
+    console.log('🎯 useDatabase saveProductionData called with:', userId, monthlyProduction);
     setIsLoading(true);
     setError(null);
     
     try {
-      const result = dbService.saveProductionData(userId, monthlyProduction);
+      console.log('📤 Calling dbService.saveProductionData...');
+      const result = await dbService.saveProductionData(userId, monthlyProduction);
+      console.log('✅ dbService.saveProductionData result:', result);
       setIsLoading(false);
       return result;
     } catch (err) {
+      console.error('❌ saveProductionData error:', err);
       setError(err.message);
       setIsLoading(false);
       throw err;

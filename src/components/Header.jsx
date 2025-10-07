@@ -7,6 +7,36 @@ const Header = ({ user, language, setLanguage }) => {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? t.goodMorning : hour < 18 ? t.goodAfternoon : t.goodEvening;
 
+  // European languages with flags
+  const languages = [
+    { code: 'en', name: 'English', flag: '🇬🇧' },
+    { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+    { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
+    { code: 'fr', name: 'Français', flag: '🇫🇷' },
+    { code: 'es', name: 'Español', flag: '🇪🇸' },
+    { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+    { code: 'nl', name: 'Nederlands', flag: '🇳🇱' },
+    { code: 'pt', name: 'Português', flag: '🇵🇹' },
+    { code: 'pl', name: 'Polski', flag: '🇵🇱' },
+    { code: 'sv', name: 'Svenska', flag: '🇸🇪' },
+    { code: 'da', name: 'Dansk', flag: '🇩🇰' },
+    { code: 'no', name: 'Norsk', flag: '🇳🇴' },
+    { code: 'fi', name: 'Suomi', flag: '🇫🇮' },
+    { code: 'cs', name: 'Čeština', flag: '🇨🇿' },
+    { code: 'sk', name: 'Slovenčina', flag: '🇸🇰' },
+    { code: 'hu', name: 'Magyar', flag: '🇭🇺' },
+    { code: 'ro', name: 'Română', flag: '🇷🇴' },
+    { code: 'bg', name: 'Български', flag: '🇧🇬' },
+    { code: 'hr', name: 'Hrvatski', flag: '🇭🇷' },
+    { code: 'sl', name: 'Slovenščina', flag: '🇸🇮' },
+    { code: 'lt', name: 'Lietuvių', flag: '🇱🇹' },
+    { code: 'lv', name: 'Latviešu', flag: '🇱🇻' },
+    { code: 'et', name: 'Eesti', flag: '🇪🇪' },
+    { code: 'mt', name: 'Malti', flag: '🇲🇹' },
+    { code: 'ga', name: 'Gaeilge', flag: '🇮🇪' },
+    { code: 'cy', name: 'Cymraeg', flag: '🏴󠁧󠁢󠁷󠁬󠁳󠁿' }
+  ];
+
   return (
     <div className="bg-white border-b px-6 py-4 flex justify-between items-center">
       <div>
@@ -18,11 +48,13 @@ const Header = ({ user, language, setLanguage }) => {
         <select 
           value={language} 
           onChange={(e) => setLanguage(e.target.value)}
-          className="border rounded px-3 py-1.5 text-sm bg-white"
+          className="border rounded px-3 py-1.5 text-sm bg-white min-w-[140px]"
         >
-          <option value="en">English</option>
-          <option value="de">Deutsch</option>
-          <option value="tr">Türkçe</option>
+          {languages.map(lang => (
+            <option key={lang.code} value={lang.code}>
+              {lang.flag} {lang.name}
+            </option>
+          ))}
         </select>
         <div className="flex items-center gap-2">
           <div className="text-right">

@@ -84,11 +84,17 @@ const ProductionPage = ({ translations, onDataChange, data = {} }) => {
   };
 
   const handleSave = () => {
+    console.log('💾 Production Save button clicked!');
+    console.log('📊 Current production data:', productionData);
+    console.log('📅 Selected year:', selectedYear);
+    
     // Trigger final save to ensure data is persistent
     const finalData = {
       ...productionData,
       year: selectedYear
     };
+    
+    console.log('📤 Calling onDataChange with:', finalData);
     onDataChange('production', finalData);
     
     // Show success message

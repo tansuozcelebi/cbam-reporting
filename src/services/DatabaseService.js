@@ -17,6 +17,34 @@ class CBAMDatabase extends Dexie {
 class DatabaseService {
   constructor() {
     this.db = new CBAMDatabase();
+    
+    // Debug: Database durumunu console'a yazdır
+    this.db.open().then(() => {
+      console.log('✅ CBAMDatabase hazır!');
+      console.log('📂 Database adı:', this.db.name);
+      console.log('🗂️ Tablolar:', Object.keys(this.db.tables));
+    }).catch(error => {
+      console.error('❌ Database açılırken hata:', error);
+    });
+  }
+
+  // Debug fonksiyonu - tüm database içeriğini göster
+  async debugDatabase() {
+    console.log('🔍 DATABASE İÇERİĞİ:');
+    
+    const users = await this.db.users.toArray();
+    console.log('👥 Users:', users);
+    
+    const entries = await this.db.emission_entries.toArray();
+    console.log('💨 Emission Entries:', entries);
+    
+    const production = await this.db.production_data.toArray();
+    console.log('🏭 Production Data:', production);
+    
+    const settings = await this.db.user_settings.toArray();
+    console.log('⚙️ User Settings:', settings);
+    
+    return { users, entries, production, settings };
   }
 
   // User operations
@@ -129,21 +157,32 @@ class DatabaseService {
 
   // Production data operations
   async saveProductionData(userId, monthlyProduction) {
+    console.log('💾 DatabaseService saveProductionData called with:', { userId, monthlyProduction });
+    
     const annualTotal = Object.values(monthlyProduction)
       .reduce((sum, val) => sum + (parseFloat(val) || 0), 0);
+    
+    console.log('📊 Calculated annual total:', annualTotal);
 
     // Delete existing production data for user
+    console.log('🗑️ Deleting existing production data for user:', userId);
     await this.db.production_data.where('user_id').equals(userId).delete();
 
     // Insert new production data
     const now = new Date().toISOString();
-    return await this.db.production_data.add({
+    const dataToSave = {
       user_id: userId,
       monthly_production: JSON.stringify(monthlyProduction),
       annual_total: annualTotal,
       created_at: now,
       updated_at: now
-    });
+    };
+    
+    console.log('💾 Saving production data:', dataToSave);
+    const result = await this.db.production_data.add(dataToSave);
+    console.log('✅ Production data saved with ID:', result);
+    
+    return result;
   }
 
   async getProductionData(userId) {
@@ -269,4 +308,8 @@ class DatabaseService {
 
 // Export singleton instance
 const dbService = new DatabaseService();
+
+// Global debug fonksiyonu - console'dan çağırılabilir
+window.debugCBAMDatabase = () => dbService.debugDatabase();
+
 export default dbService;
