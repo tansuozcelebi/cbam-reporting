@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Home, Zap, Flame, Fuel, Car, Plane, Bus, Wind, Home as HomeIcon, BarChart3, FileText, LogOut, Factory } from 'lucide-react';
+import { Home, Zap, Flame, Fuel, Car, Plane, Bus, Wind, Home as HomeIcon, BarChart3, FileText, LogOut, Factory, BatteryCharging } from 'lucide-react';
 import { AppContext } from '../App';
 
 const Sidebar = ({ currentPage, setCurrentPage, currentInputForm, setCurrentInputForm, onLogout, entries }) => {
@@ -70,6 +70,14 @@ const Sidebar = ({ currentPage, setCurrentPage, currentInputForm, setCurrentInpu
         >
           <Factory size={18} />
           <span className="text-sm font-medium">{t.production}</span>
+        </button>
+
+        <button
+          onClick={() => { setCurrentPage('renewable'); setCurrentInputForm(null); }}
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg ${currentPage === 'renewable' ? 'bg-green-50 text-green-700' : 'text-gray-700 hover:bg-gray-50'}`}
+        >
+          <BatteryCharging size={18} />
+          <span className="text-sm font-medium">{t.renewableEnergy || 'Renewable Energy'}</span>
         </button>
 
         <button
