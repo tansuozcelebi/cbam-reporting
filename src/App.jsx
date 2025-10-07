@@ -1,5 +1,6 @@
-import React, { useState, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext, useEffect } from 'react';
 import { translations } from './translations';
+import { useDatabase } from './hooks/useDatabase';
 import LoginPage from './components/LoginPage';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -19,9 +20,6 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [currentInputForm, setCurrentInputForm] = useState(null);
   
-  // Store data for multiple users
-  const [allUserData, setAllUserData] = useState({});
-  
   const [entries, setEntries] = useState({
     electricity: [],
     naturalGas: [],
@@ -35,61 +33,45 @@ const App = () => {
 
   const [productionData, setProductionData] = useState({});
 
+  // Database hooks
+  const { 
+    loginUser, 
+    saveEntry: saveEntryToDB, 
+    loadEntries: loadEntriesFromDB, 
+    deleteEntry: deleteEntryFromDB,
+    updateEntry: updateEntryInDB, 
+    saveProductionData: saveProductionToDB, 
+    loadProductionData: loadProductionFromDB,
+    saveSettings,
+    isLoading 
+  } = useDatabase();
+
   const t = translations[language];
 
-  const handleLogin = (email, password) => {
-    const userName = email.split('@')[0];
-    setUser({ name: userName, email });
-    
-    // Load user's data if exists
-    if (allUserData[email]) {
-      setEntries(allUserData[email].entries || {
-        electricity: [],
-        naturalGas: [],
-        fuel: [],
-        cars: [],
-        flights: [],
-        publicTransport: [],
-        refrigerants: [],
-        remoteWorking: []
-      });
-      setProductionData(allUserData[email].productionData || {});
-    } else {
-      // Initialize empty data for new user
-      const emptyData = {
-        entries: {
-          electricity: [],
-          naturalGas: [],
-          fuel: [],
-          cars: [],
-          flights: [],
-          publicTransport: [],
-          refrigerants: [],
-          remoteWorking: []
-        },
-        productionData: {}
-      };
-      setEntries(emptyData.entries);
-      setProductionData(emptyData.productionData);
-      setAllUserData(prev => ({
-        ...prev,
-        [email]: emptyData
-      }));
+  const handleLogin = async (email, password) => {
+    try {
+      const { user: dbUser, settings } = await loginUser(email, password);
+      setUser(dbUser);
+      setLanguage(settings.language);
+      
+      // Load user's entries and production data
+      const userEntries = await loadEntriesFromDB(dbUser.id);
+      const userProduction = await loadProductionFromDB(dbUser.id);
+      
+      setEntries(userEntries);
+      setProductionData(userProduction?.monthlyProduction || {});
+      
+      setIsLoggedIn(true);
+    } catch (error) {
+      console.error('Login failed:', error);
+      alert('Login failed. Please try again.');
     }
-    
-    setIsLoggedIn(true);
   };
 
-  const handleLogout = () => {
-    // Save current user's data before logout
-    if (user?.email) {
-      setAllUserData(prev => ({
-        ...prev,
-        [user.email]: {
-          entries: entries,
-          productionData: productionData
-        }
-      }));
+  const handleLogout = async () => {
+    // Save current settings before logout
+    if (user?.id) {
+      await saveSettings(user.id, language);
     }
     
     setIsLoggedIn(false);
@@ -97,68 +79,68 @@ const App = () => {
     setCurrentPage('dashboard');
   };
 
-  const handleProductionDataChange = (type, data) => {
-    if (type === 'production') {
+  const handleProductionDataChange = async (type, data) => {
+    if (type === 'production' && user?.id) {
       setProductionData(data);
       
-      // Save to user's data
-      if (user?.email) {
-        setAllUserData(prev => ({
-          ...prev,
-          [user.email]: {
-            ...prev[user.email],
-            productionData: data
-          }
-        }));
+      // Save to database
+      try {
+        await saveProductionToDB(user.id, data.monthlyProduction || {});
+      } catch (error) {
+        console.error('Failed to save production data:', error);
       }
     }
   };
 
-  const addEntry = (category, entry) => {
+  const addEntry = async (category, entry) => {
+    const newEntry = { ...entry, id: Date.now() };
     const newEntries = {
       ...entries,
-      [category]: [...entries[category], { ...entry, id: Date.now() }]
+      [category]: [...(entries[category] || []), newEntry]
     };
     setEntries(newEntries);
     
-    // Save to user's data
-    if (user?.email) {
-      setAllUserData(prev => ({
-        ...prev,
-        [user.email]: newEntries
-      }));
+    // Save to database
+    if (user?.id) {
+      try {
+        await saveEntryToDB(user.id, category, newEntry);
+      } catch (error) {
+        console.error('Failed to save entry:', error);
+      }
     }
   };
 
-  const updateEntry = (category, id, updatedEntry) => {
+  const updateEntry = async (category, id, updatedEntry) => {
     const newEntries = {
       ...entries,
-      [category]: entries[category].map(e => e.id === id ? { ...updatedEntry, id } : e)
+      [category]: entries[category]?.map(e => e.id === id ? { ...updatedEntry, id } : e) || []
     };
     setEntries(newEntries);
     
-    // Save to user's data
-    if (user?.email) {
-      setAllUserData(prev => ({
-        ...prev,
-        [user.email]: newEntries
-      }));
+    // Update in database
+    if (user?.id) {
+      try {
+        await updateEntryInDB(user.id, id, updatedEntry);
+      } catch (error) {
+        console.error('Failed to update entry:', error);
+      }
     }
   };
 
-  const deleteEntry = (category, id) => {
+  const deleteEntry = async (category, id) => {
     const newEntries = {
       ...entries,
-      [category]: entries[category].filter(e => e.id !== id)
+      [category]: entries[category]?.filter(e => e.id !== id) || []
     };
     setEntries(newEntries);
     
-    // Save to user's data
-    if (user?.email) {
-      setAllUserData(prev => ({
-        ...prev,
-        [user.email]: newEntries
-      }));
+    // Delete from database
+    if (user?.id) {
+      try {
+        await deleteEntryFromDB(user.id, id);
+      } catch (error) {
+        console.error('Failed to delete entry:', error);
+      }
     }
   };
 

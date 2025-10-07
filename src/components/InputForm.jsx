@@ -156,16 +156,6 @@ const InputForm = ({ category, setCurrentInputForm, setCurrentPage }) => {
       dieselCh4GlobalWarmingPower: category === 'fuel' ? '21' : '',
       dieselN2oGlobalWarmingPower: category === 'fuel' ? '310' : '',
       dieselConversionFactor: category === 'fuel' ? '4.186' : '',
-      // Diesel specific parameters
-      volumeBiodiesel: category === 'fuel' ? '0%' : '',
-      dieselSpecificGravity: category === 'fuel' ? '0.83' : '',
-      dieselNetCalorificValue: category === 'fuel' ? '10.272' : '',
-      dieselCo2Emission: category === 'fuel' ? '74.100' : '',
-      dieselCh4Emission: category === 'fuel' ? '4.15' : '',
-      dieselN2oEmission: category === 'fuel' ? '28.60' : '',
-      dieselCh4GlobalWarmingPower: category === 'fuel' ? '21' : '',
-      dieselN2oGlobalWarmingPower: category === 'fuel' ? '310' : '',
-      dieselConversionFactor: category === 'fuel' ? '4.186' : '',
       link: '',
       comments: ''
     });
