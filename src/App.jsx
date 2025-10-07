@@ -48,24 +48,59 @@ const App = () => {
 
   const t = translations[language];
 
-  const handleLogin = async (email, password) => {
-    try {
-      const { user: dbUser, settings } = await loginUser(email, password);
-      setUser(dbUser);
-      setLanguage(settings.language);
-      
-      // Load user's entries and production data
-      const userEntries = await loadEntriesFromDB(dbUser.id);
-      const userProduction = await loadProductionFromDB(dbUser.id);
-      
-      setEntries(userEntries);
-      setProductionData(userProduction?.monthlyProduction || {});
-      
-      setIsLoggedIn(true);
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please try again.');
+  const handleLogin = (email, password) => {
+    const userName = email.split('@')[0];
+    setUser({ name: userName, email });
+    
+    // Load user's data if exists
+    if (allUserData[email]) {
+      setEntries(allUserData[email].entries || {
+        electricity: [],
+        naturalGas: [],
+        fuel: [],
+        cars: [],
+        flights: [],
+        publicTransport: [],
+        refrigerants: [],
+        remoteWorking: []
+      });
+      setProductionData(allUserData[email].productionData || {
+        monthlyProduction: {
+          jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
+          jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
+        },
+        year: new Date().getFullYear()
+      });
+    } else {
+      // Initialize empty data for new user
+      const emptyData = {
+        entries: {
+          electricity: [],
+          naturalGas: [],
+          fuel: [],
+          cars: [],
+          flights: [],
+          publicTransport: [],
+          refrigerants: [],
+          remoteWorking: []
+        },
+        productionData: {
+          monthlyProduction: {
+            jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
+            jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
+          },
+          year: new Date().getFullYear()
+        }
+      };
+      setEntries(emptyData.entries);
+      setProductionData(emptyData.productionData);
+      setAllUserData(prev => ({
+        ...prev,
+        [email]: emptyData
+      }));
     }
+    
+    setIsLoggedIn(true);
   };
 
   const handleLogout = async () => {
