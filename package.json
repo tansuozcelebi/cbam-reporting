@@ -8,7 +8,9 @@
     "build": "vite build",
     "preview": "vite preview",
     "deploy": "npm run build && npx gh-pages -d dist",
-    "build-siteground": "npm run build && echo 'Build complete! Upload dist/ folder contents to cbam.fabus.app'"
+    "build-siteground": "npm run build && echo 'Build complete! Upload dist/ folder contents to cbam.fabus.app'",
+    "seo-check": "npm run build && npx lighthouse-ci autorun",
+    "analyze": "npx bundle-analyzer dist/assets/*.js"
   },
   "dependencies": {
     "dexie": "^4.2.1",
@@ -19,6 +21,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-email": "^4.3.0",
+    "react-router-dom": "^7.9.3",
     "recharts": "^2.15.4"
   },
   "devDependencies": {

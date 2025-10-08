@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { Zap, Flame, Fuel, Car, Plane, Bus, Wind, Home } from 'lucide-react';
 import { AppContext } from '../App';
+import SEOHead from './SEOHead';
 
 const Dashboard = ({ setCurrentInputForm, setCurrentPage }) => {
   const { t, entries } = useContext(AppContext);
@@ -18,6 +19,11 @@ const Dashboard = ({ setCurrentInputForm, setCurrentPage }) => {
 
   return (
     <div className="max-w-6xl">
+      <SEOHead 
+        title="Dashboard"
+        description="CBAM emissions tracking dashboard. Monitor carbon footprint across electricity, transport, fuel consumption and more for EU CBAM compliance."
+        keywords="CBAM dashboard, carbon emissions tracking, EU compliance monitoring, emissions analytics, carbon footprint dashboard"
+      />
       <div className="bg-white rounded-lg p-6 mb-6 shadow-sm">
         <div className="flex items-start justify-between mb-4">
           <div className="flex-1">

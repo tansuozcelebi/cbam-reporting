@@ -1,6 +1,7 @@
 import React, { useContext } from 'react';
 import { BookOpen, ExternalLink, Calendar, Target, Building2, Leaf, AlertCircle, CheckCircle } from 'lucide-react';
 import { AppContext } from '../App';
+import SEOHead from './SEOHead';
 
 const AboutCBAM = () => {
   const { t } = useContext(AppContext);
@@ -13,6 +14,11 @@ const AboutCBAM = () => {
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
+      <SEOHead 
+        title="About CBAM"
+        description="Complete guide to Carbon Border Adjustment Mechanism (CBAM). Learn about EU regulations, implementation timeline, affected sectors, and compliance requirements."
+        keywords="CBAM information, Carbon Border Adjustment Mechanism guide, EU CBAM regulations, carbon border tax, EU Green Deal, carbon leakage prevention"
+      />
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-3">
