@@ -133,20 +133,20 @@ const LoginPage = ({ onLogin, language, setLanguage, t }) => {
         </video>
       )}
       
-      {/* Overlay for better readability */}
-      <div className="absolute inset-0 bg-black bg-opacity-40 z-10"></div>
+      {/* Overlay for better readability - More transparent for video visibility */}
+      <div className="absolute inset-0 bg-black bg-opacity-20 z-10"></div>
       
-      {/* Login Form */}
-      <div className="relative z-20 bg-white rounded-lg shadow-2xl p-8 w-full max-w-md backdrop-blur-sm">
-        <div className="flex justify-between items-center mb-6">
+      {/* Login Form - Mobile optimized with increased transparency */}
+      <div className="relative z-20 bg-white bg-opacity-50 backdrop-blur-md rounded-lg shadow-2xl p-4 md:p-8 w-full max-w-xs md:max-w-md mx-4">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 md:mb-6 gap-3 md:gap-0">
           <div className="flex items-center gap-3">
             <div className="flex flex-col items-center">
-              <svg width="40" height="40" viewBox="0 0 100 100" className="mb-1">
+              <svg width="32" height="32" viewBox="0 0 100 100" className="mb-1 md:w-10 md:h-10">
                 <path d="M20 20 L20 80 Q20 85 25 85 L30 85 Q35 85 35 80 L35 40 Q35 35 40 35 L45 35" stroke="#dc2626" strokeWidth="6" fill="none" strokeLinecap="round"/>
                 <path d="M30 20 L30 80 Q30 85 35 85 L40 85 Q45 85 45 80 L45 40 Q45 35 50 35 L55 35" stroke="#dc2626" strokeWidth="6" fill="none" strokeLinecap="round"/>
                 <path d="M40 20 L40 80 Q40 85 45 85 L50 85 Q55 85 55 80 L55 40 Q55 35 60 35 L65 35" stroke="#dc2626" strokeWidth="6" fill="none" strokeLinecap="round"/>
               </svg>
-              <span className="text-2xl font-bold text-red-600 tracking-wider">KREA</span>
+              <span className="text-lg md:text-2xl font-bold text-red-600 tracking-wider">KREA</span>
             </div>
           </div>
           
@@ -193,7 +193,11 @@ const LoginPage = ({ onLogin, language, setLanguage, t }) => {
           </div>
         </div>
         <h1 className="text-xl font-bold text-gray-800 mb-2">{t.appName}</h1>
-        <p className="text-gray-600 mb-8 text-sm">{t.description}</p>
+        <div className="text-gray-600 mb-8 text-sm">
+          {t.description.split('\n').map((line, index) => (
+            <div key={index}>{line}</div>
+          ))}
+        </div>
         
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm">
@@ -201,32 +205,32 @@ const LoginPage = ({ onLogin, language, setLanguage, t }) => {
           </div>
         )}
         
-        <div className="space-y-4">
+        <div className="space-y-3 md:space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t.email}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">{t.email}</label>
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm md:text-base"
               placeholder="user@example.com"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{t.password}</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1 md:mb-2">{t.password}</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+              className="w-full px-3 md:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent text-sm md:text-base"
               placeholder="••••••••"
             />
           </div>
           <button
             onClick={handleLogin}
-            className="w-full bg-teal-600 text-white py-2 rounded-lg hover:bg-teal-700 transition font-medium"
+            className="w-full bg-teal-600 text-white py-2 md:py-3 rounded-lg hover:bg-teal-700 transition font-medium text-sm md:text-base"
           >
             {t.signIn}
           </button>

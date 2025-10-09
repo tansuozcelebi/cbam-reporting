@@ -2,16 +2,61 @@ import React, { useState, useEffect } from 'react';
 import { Zap, Plus, Trash2, Save, Info } from 'lucide-react';
 
 const RenewableEnergyPage = ({ t }) => {
-  const [renewableData, setRenewableData] = useState([]);
+  const [renewableDataByYear, setRenewableDataByYear] = useState({});
+  const [selectedYear, setSelectedYear] = useState(2025);
   const [showErrorMessage, setShowErrorMessage] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    const savedData = localStorage.getItem('renewableEnergyData');
-    if (savedData) {
-      setRenewableData(JSON.parse(savedData));
+    // Load year-based data from localStorage
+    const savedDataByYear = localStorage.getItem('renewableEnergyDataByYear');
+    if (savedDataByYear) {
+      setRenewableDataByYear(JSON.parse(savedDataByYear));
+    } else {
+      // Migrate old data if exists
+      const oldData = localStorage.getItem('renewableEnergyData');
+      if (oldData) {
+        const parsedOldData = JSON.parse(oldData);
+        const migratedData = {
+          2025: parsedOldData
+        };
+        setRenewableDataByYear(migratedData);
+        localStorage.setItem('renewableEnergyDataByYear', JSON.stringify(migratedData));
+        localStorage.removeItem('renewableEnergyData'); // Clean up old storage
+      }
     }
   }, []);
+
+  // Get current year data
+  const getCurrentYearData = () => {
+    return renewableDataByYear[selectedYear] || [];
+  };
+
+  // Save data to localStorage
+  const saveToLocalStorage = (updatedDataByYear) => {
+    try {
+      localStorage.setItem('renewableEnergyDataByYear', JSON.stringify(updatedDataByYear));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+      showError(t.saveError || 'Error saving data');
+    }
+  };
+
+  // Handle year change
+  const handleYearChange = (newYear) => {
+    // Save current data before switching
+    const currentData = getCurrentYearData();
+    const updatedDataByYear = {
+      ...renewableDataByYear,
+      [selectedYear]: currentData
+    };
+    
+    setRenewableDataByYear(updatedDataByYear);
+    saveToLocalStorage(updatedDataByYear);
+    
+    // Switch to new year
+    setSelectedYear(newYear);
+  };
 
   const energyTypes = [
     { value: 'Solar', label: 'Solar Energy' },
@@ -32,28 +77,54 @@ const RenewableEnergyPage = ({ t }) => {
   };
 
   const addNewEntry = () => {
+    const currentData = getCurrentYearData();
     const newEntry = {
       id: Date.now(),
       type: 'Solar',
       data: new Array(12).fill('')
     };
-    setRenewableData([...renewableData, newEntry]);
+    const updatedData = [...currentData, newEntry];
+    
+    const updatedDataByYear = {
+      ...renewableDataByYear,
+      [selectedYear]: updatedData
+    };
+    
+    setRenewableDataByYear(updatedDataByYear);
+    saveToLocalStorage(updatedDataByYear);
   };
 
   const removeEntry = (id) => {
-    setRenewableData(renewableData.filter(entry => entry.id !== id));
-    saveToLocalStorage(renewableData.filter(entry => entry.id !== id));
+    const currentData = getCurrentYearData();
+    const updatedData = currentData.filter(entry => entry.id !== id);
+    
+    const updatedDataByYear = {
+      ...renewableDataByYear,
+      [selectedYear]: updatedData
+    };
+    
+    setRenewableDataByYear(updatedDataByYear);
+    saveToLocalStorage(updatedDataByYear);
   };
 
   const updateEntry = (id, field, value) => {
-    const updatedData = renewableData.map(entry => 
+    const currentData = getCurrentYearData();
+    const updatedData = currentData.map(entry => 
       entry.id === id ? { ...entry, [field]: value } : entry
     );
-    setRenewableData(updatedData);
+    
+    const updatedDataByYear = {
+      ...renewableDataByYear,
+      [selectedYear]: updatedData
+    };
+    
+    setRenewableDataByYear(updatedDataByYear);
+    saveToLocalStorage(updatedDataByYear);
   };
 
   const updateMonthData = (id, monthIndex, value) => {
-    const updatedData = renewableData.map(entry => {
+    const currentData = getCurrentYearData();
+    const updatedData = currentData.map(entry => {
       if (entry.id === id) {
         const newData = [...entry.data];
         newData[monthIndex] = value;
@@ -61,23 +132,29 @@ const RenewableEnergyPage = ({ t }) => {
       }
       return entry;
     });
-    setRenewableData(updatedData);
-  };
-
-  const saveToLocalStorage = (data) => {
-    try {
-      localStorage.setItem('renewableEnergyData', JSON.stringify(data));
-    } catch (error) {
-      showError('Failed to save data to local storage');
-    }
+    
+    const updatedDataByYear = {
+      ...renewableDataByYear,
+      [selectedYear]: updatedData
+    };
+    
+    setRenewableDataByYear(updatedDataByYear);
+    saveToLocalStorage(updatedDataByYear);
   };
 
   const handleSaveAll = () => {
     try {
-      saveToLocalStorage(renewableData);
-      showError('Data saved successfully!');
+      const currentData = getCurrentYearData();
+      const updatedDataByYear = {
+        ...renewableDataByYear,
+        [selectedYear]: currentData
+      };
+      
+      saveToLocalStorage(updatedDataByYear);
+      showError(t.dataSaved || `Data saved successfully for ${selectedYear}!`);
     } catch (error) {
-      showError('Failed to save data');
+      console.error('Error saving renewable energy data:', error);
+      showError(t.saveError || 'Failed to save data');
     }
   };
 
@@ -98,7 +175,8 @@ const RenewableEnergyPage = ({ t }) => {
   };
 
   const getTotalReduction = () => {
-    return renewableData.reduce((total, entry) => {
+    const currentData = getCurrentYearData();
+    return currentData.reduce((total, entry) => {
       const entryTotal = entry.data.reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
       return total + (entryTotal * 1); // 1 tCO2/MWh
     }, 0).toFixed(2);
@@ -112,9 +190,25 @@ const RenewableEnergyPage = ({ t }) => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <Zap className="h-8 w-8 text-green-600" />
-              <h1 className="text-2xl font-bold text-gray-800">{t.renewableElectricity || 'Renewable Electricity Generation'}</h1>
+              <h1 className="text-2xl font-bold text-gray-800">
+                {t.renewableElectricity || 'Renewable Electricity Generation'} - {selectedYear}
+              </h1>
             </div>
-            <div className="flex gap-3">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-gray-700">
+                  {t.year || 'Year'}:
+                </label>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => handleYearChange(parseInt(e.target.value))}
+                  className="px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                >
+                  {[2023, 2024, 2025, 2026, 2027].map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+              </div>
               <button
                 onClick={addNewEntry}
                 className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
@@ -156,13 +250,15 @@ const RenewableEnergyPage = ({ t }) => {
         )}
 
         {/* Total Summary */}
-        {renewableData.length > 0 && (
+        {getCurrentYearData().length > 0 && (
           <div className="bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">{t.totalSummary || 'Total Summary'}</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              {t.totalSummary || 'Total Summary'} - {selectedYear}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="text-center bg-green-50 p-4 rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
-                  {renewableData.reduce((total, entry) => {
+                  {getCurrentYearData().reduce((total, entry) => {
                     const entryTotal = entry.data.reduce((sum, value) => sum + (parseFloat(value) || 0), 0);
                     return total + entryTotal;
                   }, 0).toFixed(2)}
@@ -174,7 +270,7 @@ const RenewableEnergyPage = ({ t }) => {
                 <div className="text-sm text-green-700">{t.totalCO2Reduced || 'Total CO₂ Reduced (tCO₂)'}</div>
               </div>
               <div className="text-center bg-green-50 p-4 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">{renewableData.length}</div>
+                <div className="text-2xl font-bold text-green-600">{getCurrentYearData().length}</div>
                 <div className="text-sm text-green-700">{t.activeProjects || 'Active Projects'}</div>
               </div>
             </div>
@@ -182,11 +278,11 @@ const RenewableEnergyPage = ({ t }) => {
         )}
 
         {/* Renewable Energy Entries */}
-        {renewableData.length === 0 ? (
+        {getCurrentYearData().length === 0 ? (
           <div className="bg-white rounded-xl shadow-lg p-8 text-center">
             <Zap className="h-16 w-16 text-green-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-700 mb-2">
-              {t.noRenewableData || 'No renewable energy data yet'}
+              {t.noRenewableData || 'No renewable energy data yet'} ({selectedYear})
             </h3>
             <p className="text-gray-500 mb-4">
               {t.startAddingData || 'Start by adding your first renewable energy generation project'}
@@ -199,7 +295,7 @@ const RenewableEnergyPage = ({ t }) => {
             </button>
           </div>
         ) : (
-          renewableData.map((entry) => {
+          getCurrentYearData().map((entry) => {
             const totals = calculateTotals(entry);
             return (
               <div key={entry.id} className="bg-white rounded-xl shadow-lg p-6 border-l-4 border-green-600">
@@ -207,7 +303,7 @@ const RenewableEnergyPage = ({ t }) => {
                   <div className="flex items-center gap-3">
                     <Zap className="h-6 w-6 text-green-600" />
                     <h3 className="text-xl font-semibold text-gray-800">
-                      {t.renewableElectricity || 'Renewable electricity'} ({entry.type}) - 2025
+                      {t.renewableElectricity || 'Renewable electricity'} ({entry.type}) - {selectedYear}
                     </h3>
                   </div>
                   <div className="flex items-center gap-4">

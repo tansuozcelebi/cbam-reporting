@@ -1,5 +1,4 @@
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
 
 const SEOHead = ({ 
   title, 
@@ -8,8 +7,15 @@ const SEOHead = ({
   image = 'https://cbam.fabus.app/krea-logo.jpg',
   url 
 }) => {
-  const location = useLocation();
-  const currentUrl = url || `https://cbam.fabus.app${location.pathname}`;
+  // Get current path from window location instead of useLocation
+  const getCurrentPath = () => {
+    if (typeof window !== 'undefined') {
+      return window.location.pathname;
+    }
+    return '/';
+  };
+
+  const currentUrl = url || `https://cbam.fabus.app${getCurrentPath()}`;
 
   useEffect(() => {
     // Update document title

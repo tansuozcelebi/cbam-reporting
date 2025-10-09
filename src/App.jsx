@@ -1,4 +1,5 @@
 import React, { useState, createContext, useContext, useEffect } from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { translations } from './translations';
 import { useDatabase } from './hooks/useDatabase';
 import LoginPage from './components/LoginPage';
@@ -214,47 +215,51 @@ const App = () => {
   };
 
   if (!isLoggedIn) {
-    return <LoginPage onLogin={handleLogin} language={language} setLanguage={setLanguage} t={t} />;
+    return (
+      <Router>
+        <LoginPage onLogin={handleLogin} language={language} setLanguage={setLanguage} t={t} />
+      </Router>
+    );
   }
 
   return (
-    <AppContext.Provider value={{ entries, addEntry, updateEntry, deleteEntry, user, language, setLanguage, t }}>
-      <div className="flex h-screen bg-gray-50">
-        <Sidebar 
-          currentPage={currentPage} 
-          setCurrentPage={setCurrentPage}
-          currentInputForm={currentInputForm}
-          setCurrentInputForm={setCurrentInputForm}
-          onLogout={handleLogout}
-          entries={entries}
-        />
-        <div className="flex-1 overflow-auto">
-          <Header user={user} language={language} setLanguage={setLanguage} />
-          <main className="p-6">
-            {currentPage === 'dashboard' && <Dashboard setCurrentInputForm={setCurrentInputForm} setCurrentPage={setCurrentPage} />}
-            {currentPage === 'input' && currentInputForm && (
-              <InputForm 
-                category={currentInputForm} 
-                setCurrentInputForm={setCurrentInputForm}
-                setCurrentPage={setCurrentPage}
-              />
-            )}
-            {currentPage === 'production' && (
-              <ProductionPage 
-                translations={t}
-                onDataChange={handleProductionDataChange}
-                data={productionData}
-              />
-            )}
-            {currentPage === 'renewable' && <RenewableEnergyPage t={t} />}
-            {currentPage === 'results' && <ResultsPage />}
-            {currentPage === 'analysis' && <AnalysisPage productionData={productionData} />}
-            {currentPage === 'aboutCBAM' && <AboutCBAM />}
-          </main>
+    <Router>
+      <AppContext.Provider value={{ entries, addEntry, updateEntry, deleteEntry, user, language, setLanguage, t }}>
+        <div className="flex h-screen bg-gray-50">
+          <Sidebar 
+            currentPage={currentPage} 
+            setCurrentPage={setCurrentPage}
+            currentInputForm={currentInputForm}
+            setCurrentInputForm={setCurrentInputForm}
+            onLogout={handleLogout}
+            entries={entries}
+          />
+          <div className="flex-1 overflow-auto lg:ml-0">
+            <Header user={user} language={language} setLanguage={setLanguage} />
+            <main className="p-3 md:p-6 pt-16 lg:pt-6">
+              {currentPage === 'dashboard' && <Dashboard setCurrentInputForm={setCurrentInputForm} setCurrentPage={setCurrentPage} />}
+              {currentPage === 'input' && currentInputForm && (
+                <InputForm 
+                  category={currentInputForm} 
+                  setCurrentInputForm={setCurrentInputForm}
+                  setCurrentPage={setCurrentPage}
+                />
+              )}
+              {currentPage === 'production' && (
+                <ProductionPage 
+                  translations={t}
+                  onDataChange={handleProductionDataChange}
+                  data={productionData}
+                />
+              )}
+              {currentPage === 'renewable' && <RenewableEnergyPage t={t} />}
+              {currentPage === 'results' && <ResultsPage />}
+              {currentPage === 'analysis' && <AnalysisPage productionData={productionData} />}
+              {currentPage === 'aboutCBAM' && <AboutCBAM />}
+            </main>
+          </div>
         </div>
-      </div>
-    </AppContext.Provider>
+      </AppContext.Provider>
+    </Router>
   );
-};
-
-export default App;
+};export default App;

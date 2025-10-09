@@ -6,24 +6,72 @@ const ProductionPage = ({ translations, onDataChange, data = {} }) => {
   const [error, setError] = useState('');
   const [showError, setShowError] = useState(false);
   
-  // Production data
-  const [productionData, setProductionData] = useState({
-    monthlyProduction: {
-      jan: data.monthlyProduction?.jan || '',
-      feb: data.monthlyProduction?.feb || '',
-      mar: data.monthlyProduction?.mar || '',
-      apr: data.monthlyProduction?.apr || '',
-      may: data.monthlyProduction?.may || '',
-      jun: data.monthlyProduction?.jun || '',
-      jul: data.monthlyProduction?.jul || '',
-      aug: data.monthlyProduction?.aug || '',
-      sep: data.monthlyProduction?.sep || '',
-      oct: data.monthlyProduction?.oct || '',
-      nov: data.monthlyProduction?.nov || '',
-      dec: data.monthlyProduction?.dec || ''
-    },
-    year: data.year || new Date().getFullYear()
+  // Store production data by year
+  const [productionDataByYear, setProductionDataByYear] = useState({});
+  
+  // Get empty month data
+  const getEmptyMonthData = () => ({
+    jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
+    jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
   });
+
+  // Initialize production data for current year
+  useEffect(() => {
+    // Load from localStorage if available
+    const savedData = localStorage.getItem('productionDataByYear');
+    if (savedData) {
+      try {
+        const parsedData = JSON.parse(savedData);
+        setProductionDataByYear(parsedData);
+      } catch (error) {
+        console.error('Error loading production data:', error);
+      }
+    }
+    
+    // Load from props data if available
+    if (data?.monthlyProduction && data?.year) {
+      setProductionDataByYear(prev => ({
+        ...prev,
+        [data.year]: {
+          monthlyProduction: data.monthlyProduction,
+          year: data.year
+        }
+      }));
+    }
+  }, [data]);
+
+  // Get current year data
+  const getCurrentYearData = () => {
+    return productionDataByYear[selectedYear] || {
+      monthlyProduction: getEmptyMonthData(),
+      year: selectedYear
+    };
+  };
+
+  // Save data to localStorage
+  const saveToLocalStorage = (updatedData) => {
+    try {
+      localStorage.setItem('productionDataByYear', JSON.stringify(updatedData));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  };
+
+  // Handle year change
+  const handleYearChange = (newYear) => {
+    // Save current data before switching
+    const currentData = getCurrentYearData();
+    const updatedDataByYear = {
+      ...productionDataByYear,
+      [selectedYear]: currentData
+    };
+    
+    setProductionDataByYear(updatedDataByYear);
+    saveToLocalStorage(updatedDataByYear);
+    
+    // Switch to new year
+    setSelectedYear(newYear);
+  };
 
   const months = [
     { key: 'jan', label: 'Jan' },
@@ -59,7 +107,8 @@ const ProductionPage = ({ translations, onDataChange, data = {} }) => {
 
   // Calculate production totals
   const calculateTotals = () => {
-    const monthlyValues = Object.values(productionData.monthlyProduction).map(v => {
+    const currentData = getCurrentYearData();
+    const monthlyValues = Object.values(currentData.monthlyProduction).map(v => {
       const num = parseFloat(v);
       return isNaN(num) ? 0 : num;
     });
@@ -88,23 +137,38 @@ const ProductionPage = ({ translations, onDataChange, data = {} }) => {
       return;
     }
 
-    const updatedData = {
-      ...productionData,
-      monthlyProduction: {
-        ...productionData.monthlyProduction,
-        [month]: value
+    // Update current year data
+    const currentData = getCurrentYearData();
+    const updatedMonthlyData = {
+      ...currentData.monthlyProduction,
+      [month]: value
+    };
+
+    const updatedDataByYear = {
+      ...productionDataByYear,
+      [selectedYear]: {
+        ...currentData,
+        monthlyProduction: updatedMonthlyData,
+        year: selectedYear
       }
     };
-    setProductionData(updatedData);
+
+    setProductionDataByYear(updatedDataByYear);
+    saveToLocalStorage(updatedDataByYear);
     
+    // Notify parent component
     if (onDataChange) {
-      onDataChange(updatedData);
+      onDataChange({
+        monthlyProduction: updatedMonthlyData,
+        year: selectedYear
+      });
     }
   };
 
   const handleSave = () => {
     try {
-      const hasValidData = Object.values(productionData.monthlyProduction).some(value => 
+      const currentData = getCurrentYearData();
+      const hasValidData = Object.values(currentData.monthlyProduction).some(value => 
         value && !isNaN(parseFloat(value))
       );
 
@@ -113,15 +177,30 @@ const ProductionPage = ({ translations, onDataChange, data = {} }) => {
         return;
       }
 
+      // Save current year data
+      const updatedDataByYear = {
+        ...productionDataByYear,
+        [selectedYear]: {
+          ...currentData,
+          year: selectedYear
+        }
+      };
+
+      setProductionDataByYear(updatedDataByYear);
+      saveToLocalStorage(updatedDataByYear);
+
       if (onDataChange) {
-        onDataChange(productionData);
+        onDataChange({
+          monthlyProduction: currentData.monthlyProduction,
+          year: selectedYear
+        });
       }
       
-      // Save to localStorage as backup
-      localStorage.setItem('productionData', JSON.stringify(productionData));
-      showErrorMessage(translations.dataSavedSuccessfully || 'Data saved successfully!');
+      // Success feedback
+      showErrorMessage(translations.dataSaved || `Data saved successfully for ${selectedYear}!`);
+      
     } catch (error) {
-      console.error('Save error:', error);
+      console.error('Error saving production data:', error);
       showErrorMessage(translations.saveError || 'Error saving data');
     }
   };
@@ -157,7 +236,7 @@ const ProductionPage = ({ translations, onDataChange, data = {} }) => {
                 </label>
                 <select
                   value={selectedYear}
-                  onChange={(e) => setSelectedYear(parseInt(e.target.value))}
+                  onChange={(e) => handleYearChange(parseInt(e.target.value))}
                   className="px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 >
                   {[2023, 2024, 2025, 2026, 2027].map(year => (
@@ -200,7 +279,7 @@ const ProductionPage = ({ translations, onDataChange, data = {} }) => {
                 <input
                   type="number"
                   step="0.01"
-                  value={productionData.monthlyProduction[month.key]}
+                  value={getCurrentYearData().monthlyProduction[month.key]}
                   onChange={(e) => handleProductionChange(month.key, e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   placeholder="0.00"
