@@ -4,6 +4,33 @@ import { AppContext } from '../App';
 const ResultsPage = () => {
   const { t, entries } = useContext(AppContext);
 
+  // Get renewable energy data from localStorage
+  const getRenewableEnergyData = () => {
+    try {
+      const savedData = localStorage.getItem('renewableEnergyData');
+      return savedData ? JSON.parse(savedData) : [];
+    } catch (error) {
+      console.error('Error reading renewable energy data:', error);
+      return [];
+    }
+  };
+
+  // Calculate renewable energy CO2 reduction
+  const calculateRenewableReduction = () => {
+    const renewableData = getRenewableEnergyData();
+    let totalReduction = 0;
+    
+    renewableData.forEach(project => {
+      if (project.monthlyData) {
+        const monthlyValues = Object.values(project.monthlyData).map(v => parseFloat(v) || 0);
+        const totalGeneration = monthlyValues.reduce((sum, val) => sum + val, 0);
+        totalReduction += totalGeneration * 1; // 1 tCO₂/MWh reduction factor
+      }
+    });
+    
+    return totalReduction;
+  };
+
   const calculateEmissions = (category, entry) => {
     if (category === 'electricity') {
       const factor = parseFloat(entry.supplierFactor) || parseFloat(entry.co2EmissionFactor) || 0.4;
@@ -72,7 +99,9 @@ const ResultsPage = () => {
     }))
   );
 
-  const totalEmissions = allEntries.reduce((sum, entry) => sum + parseFloat(entry.emissions), 0).toFixed(2);
+  const grossTotalEmissions = allEntries.reduce((sum, entry) => sum + parseFloat(entry.emissions), 0);
+  const renewableReduction = calculateRenewableReduction();
+  const totalEmissions = Math.max(0, grossTotalEmissions - renewableReduction).toFixed(2);
   const totalWTT = allEntries.reduce((sum, entry) => sum + parseFloat(entry.wttEmissions), 0).toFixed(2);
   const overallTotal = (parseFloat(totalEmissions) + parseFloat(totalWTT)).toFixed(2);
 
@@ -125,6 +154,12 @@ const ResultsPage = () => {
           <div className="bg-teal-50 p-4 rounded-lg flex-1">
             <p className="text-sm text-gray-600">{t.totalEmissions}</p>
             <p className="text-2xl font-bold text-teal-700">{totalEmissions} tCO₂e</p>
+            {renewableReduction > 0 && (
+              <div className="mt-2 text-xs">
+                <p className="text-gray-600">Gross: {grossTotalEmissions.toFixed(2)} tCO₂e</p>
+                <p className="text-green-600">Renewable reduction: -{renewableReduction.toFixed(2)} tCO₂e</p>
+              </div>
+            )}
           </div>
           <div className="bg-orange-50 p-4 rounded-lg flex-1">
             <p className="text-sm text-gray-600">{t.wttEmissions}</p>

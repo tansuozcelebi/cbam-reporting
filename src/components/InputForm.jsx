@@ -1,9 +1,11 @@
-import React, { useState, useContext } from 'react';
-import { Zap, Flame, Fuel, Car, Plane, Bus, Wind, Home, Save, X, Edit2, Trash2 } from 'lucide-react';
+import React, { useState, useContext, useEffect } from 'react';
+import { Zap, Flame, Fuel, Car, Plane, Bus, Wind, Home, Save, X, Edit2, Trash2, AlertCircle } from 'lucide-react';
 import { AppContext } from '../App';
 
 const InputForm = ({ category, setCurrentInputForm, setCurrentPage }) => {
   const { t, addEntry, entries, updateEntry, deleteEntry } = useContext(AppContext);
+  const [error, setError] = useState('');
+  const [showError, setShowError] = useState(false);
   const [formData, setFormData] = useState({
     source: 'purchased',
     supplierFactor: '',
@@ -41,6 +43,23 @@ const InputForm = ({ category, setCurrentInputForm, setCurrentPage }) => {
   });
   const [editingId, setEditingId] = useState(null);
 
+  // Error popup auto-hide effect
+  useEffect(() => {
+    if (showError) {
+      const timer = setTimeout(() => {
+        setShowError(false);
+        setError('');
+      }, 4000); // 4 saniye sonra kaybolsun
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showError]);
+
+  const showErrorMessage = (message) => {
+    setError(message);
+    setShowError(true);
+  };
+
   const months = [
     { key: 'jan', label: 'JAN' },
     { key: 'feb', label: 'FEB' },
@@ -71,51 +90,88 @@ const InputForm = ({ category, setCurrentInputForm, setCurrentPage }) => {
   const categoryLabel = t[category];
 
   const handleSave = () => {
+    // Validation for different categories
     if (category === 'electricity') {
       // Electricity için aylık verilerden en az biri dolu olmalı
       const hasMonthlyData = Object.values(formData.monthlyData).some(value => value && value.trim() !== '');
-      if (!hasMonthlyData) return;
+      if (!hasMonthlyData) {
+        showErrorMessage(t.pleaseEnterValue || "Please enter a value");
+        return;
+      }
+      if (!formData.co2EmissionFactor || formData.co2EmissionFactor.trim() === '') {
+        showErrorMessage(t.pleaseEnterValue || "Please enter CO₂ emission factor");
+        return;
+      }
     }
+    
     if (category === 'naturalGas') {
       // Natural Gas için aylık verilerden en az biri dolu olmalı
       const hasMonthlyData = Object.values(formData.monthlyData).some(value => value && value.trim() !== '');
-      if (!hasMonthlyData) return;
+      if (!hasMonthlyData) {
+        showErrorMessage(t.pleaseEnterValue || "Please enter a value");
+        return;
+      }
+      if (!formData.unitOfMeasure) {
+        showErrorMessage(t.pleaseSelectUnit || "Please select a unit of measure");
+        return;
+      }
     }
+    
     if (category === 'fuel') {
       // Diesel için aylık verilerden en az biri dolu olmalı
       const hasMonthlyData = Object.values(formData.monthlyData).some(value => value && value.trim() !== '');
-      if (!hasMonthlyData) return;
+      if (!hasMonthlyData) {
+        showErrorMessage(t.pleaseEnterValue || "Please enter a value");
+        return;
+      }
     }
-    if (category !== 'electricity' && category !== 'naturalGas' && category !== 'fuel' && (!formData.unitOfMeasure || !formData.amount)) return;
+    
+    if (category !== 'electricity' && category !== 'naturalGas' && category !== 'fuel') {
+      if (!formData.unitOfMeasure) {
+        showErrorMessage(t.pleaseSelectUnit || "Please select a unit of measure");
+        return;
+      }
+      if (!formData.amount || formData.amount.trim() === '') {
+        showErrorMessage(t.pleaseEnterAmount || "Please enter the amount");
+        return;
+      }
+    }
 
-    if (editingId) {
-      updateEntry(category, editingId, formData);
-      setEditingId(null);
-    } else {
-      addEntry(category, formData);
+    try {
+      if (editingId) {
+        updateEntry(category, editingId, formData);
+        setEditingId(null);
+      } else {
+        addEntry(category, formData);
+      }
+      
+      // Clear form after successful save
+      setFormData({
+        source: 'purchased',
+        supplierFactor: '',
+        usage: '',
+        unitOfMeasure: category === 'naturalGas' ? 'm3' : '',
+        amount: '',
+        year: new Date().getFullYear(),
+        monthlyData: {
+          jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
+          jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
+        },
+        // Natural Gas specific parameters
+        netCalorificValue: category === 'naturalGas' ? '184625.6' : '',
+        co2Emission: category === 'naturalGas' ? '56.100' : '',
+        ch4Emission: category === 'naturalGas' ? '1' : '',
+        n2oEmission: category === 'naturalGas' ? '0.1' : '',
+        ch4GlobalWarmingPower: category === 'naturalGas' ? '21' : '',
+        n2oGlobalWarmingPower: category === 'naturalGas' ? '310' : '',
+        conversionFactor: category === 'naturalGas' ? '4.186' : '',
+        link: '',
+        comments: ''
+      });
+    } catch (error) {
+      console.error('Error saving entry:', error);
+      showErrorMessage(t.dataValidationError || "Please check your data and try again");
     }
-    setFormData({
-      source: 'purchased',
-      supplierFactor: '',
-      usage: '',
-      unitOfMeasure: category === 'naturalGas' ? 'm3' : '',
-      amount: '',
-      year: new Date().getFullYear(),
-      monthlyData: {
-        jan: '', feb: '', mar: '', apr: '', may: '', jun: '',
-        jul: '', aug: '', sep: '', oct: '', nov: '', dec: ''
-      },
-      // Natural Gas specific parameters
-      netCalorificValue: category === 'naturalGas' ? '184625.6' : '',
-      co2Emission: category === 'naturalGas' ? '56.100' : '',
-      ch4Emission: category === 'naturalGas' ? '1' : '',
-      n2oEmission: category === 'naturalGas' ? '0.1' : '',
-      ch4GlobalWarmingPower: category === 'naturalGas' ? '21' : '',
-      n2oGlobalWarmingPower: category === 'naturalGas' ? '310' : '',
-      conversionFactor: category === 'naturalGas' ? '4.186' : '',
-      link: '',
-      comments: ''
-    });
   };
 
   const handleEdit = (entry) => {
@@ -164,6 +220,33 @@ const InputForm = ({ category, setCurrentInputForm, setCurrentPage }) => {
 
   return (
     <div className="max-w-4xl">
+      {/* Error Popup */}
+      {showError && (
+        <div className="fixed top-4 right-4 z-50 animate-slide-in-right">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 shadow-lg max-w-sm">
+            <div className="flex items-start gap-3">
+              <div className="flex-shrink-0">
+                <AlertCircle className="h-5 w-5 text-red-600" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-sm font-medium text-red-800">
+                  {t.error || "Error"}
+                </h3>
+                <p className="text-sm text-red-700 mt-1">
+                  {error}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowError(false)}
+                className="flex-shrink-0 text-red-400 hover:text-red-600"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
         <div className="flex items-center gap-3 mb-6">
           <div className="p-3 bg-teal-100 rounded-full">

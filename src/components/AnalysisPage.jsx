@@ -1,10 +1,55 @@
-import React, { useContext } from 'react';
-import { Download, Globe, BarChart3, FileText } from 'lucide-react';
+import React, { useContext, useState, useEffect, useRef } from 'react';
+import { Download, Globe, BarChart3, FileText, ChevronDown, Settings, Palette } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { AppContext } from '../App';
+import ReportDesigner from './ReportDesigner';
 
 const AnalysisPage = ({ productionData = {} }) => {
   const { t, entries } = useContext(AppContext);
+  const [showReportDesigner, setShowReportDesigner] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Get renewable energy data from localStorage
+  const getRenewableEnergyData = () => {
+    try {
+      const savedData = localStorage.getItem('renewableEnergyData');
+      return savedData ? JSON.parse(savedData) : [];
+    } catch (error) {
+      console.error('Error reading renewable energy data:', error);
+      return [];
+    }
+  };
+
+  // Calculate renewable energy CO2 reduction
+  const calculateRenewableReduction = () => {
+    const renewableData = getRenewableEnergyData();
+    let totalReduction = 0;
+    
+    renewableData.forEach(project => {
+      if (project.monthlyData) {
+        const monthlyValues = Object.values(project.monthlyData).map(v => parseFloat(v) || 0);
+        const totalGeneration = monthlyValues.reduce((sum, val) => sum + val, 0);
+        totalReduction += totalGeneration * 1; // 1 tCO₂/MWh reduction factor
+      }
+    });
+    
+    return totalReduction;
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const calculateEmissions = (category, entry) => {
     if (category === 'electricity') {
@@ -57,7 +102,12 @@ const AnalysisPage = ({ productionData = {} }) => {
     .filter(e => ['flights', 'publicTransport', 'remoteWorking'].includes(e.category))
     .reduce((sum, e) => sum + e.emissions, 0);
 
-  const totalEmissions = scope1Emissions + scope2Emissions + scope3Emissions;
+  // Calculate renewable energy reduction
+  const renewableReduction = calculateRenewableReduction();
+  
+  // Calculate net total emissions (subtract renewable energy reduction)
+  const grossTotalEmissions = scope1Emissions + scope2Emissions + scope3Emissions;
+  const totalEmissions = Math.max(0, grossTotalEmissions - renewableReduction);
   const scope1Percentage = totalEmissions > 0 ? ((scope1Emissions / totalEmissions) * 100).toFixed(1) : 0;
   const scope2Percentage = totalEmissions > 0 ? ((scope2Emissions / totalEmissions) * 100).toFixed(1) : 0;
   const scope3Percentage = totalEmissions > 0 ? ((scope3Emissions / totalEmissions) * 100).toFixed(1) : 0;
@@ -97,9 +147,21 @@ const AnalysisPage = ({ productionData = {} }) => {
         });
       });
       
+      // Subtract renewable energy reduction for this month
+      const renewableData = getRenewableEnergyData();
+      let monthlyRenewableReduction = 0;
+      renewableData.forEach(project => {
+        if (project.monthlyData && project.monthlyData[monthKey]) {
+          const monthlyGeneration = parseFloat(project.monthlyData[monthKey]) || 0;
+          monthlyRenewableReduction += monthlyGeneration * 1; // 1 tCO₂/MWh
+        }
+      });
+      
+      const netEmissions = Math.max(0, monthlyEmissions - monthlyRenewableReduction);
+      
       return {
         month: monthLabels[index],
-        emissions: monthlyEmissions.toFixed(2)
+        emissions: netEmissions.toFixed(2)
       };
     });
   };
@@ -146,6 +208,41 @@ const AnalysisPage = ({ productionData = {} }) => {
 
   const emissionsPerKgData = calculateEmissionsPerKg();
 
+  // Prepare data for ReportDesigner
+  const reportData = {
+    totalEmissions,
+    scope1Emissions,
+    scope2Emissions,
+    scope3Emissions,
+    scope1Percentage,
+    scope2Percentage,
+    scope3Percentage,
+    categoryEmissions,
+    monthlyData,
+    mainCategory: categoryEmissions[0],
+    totalEntries: allEntries.length,
+    emissionsPerKgData
+  };
+
+  // Quick PDF download function
+  const quickDownloadPDF = () => {
+    // Simple PDF download with default settings
+    const element = document.createElement('div');
+    element.innerHTML = `
+      <div style="padding: 20px; font-family: Arial, sans-serif;">
+        <h1 style="color: #14b8a6;">CBAM Carbon Footprint Report</h1>
+        <p><strong>Total Emissions:</strong> ${totalEmissions.toFixed(2)} tCO₂e</p>
+        <p><strong>Scope 1:</strong> ${scope1Emissions.toFixed(2)} tCO₂e (${scope1Percentage}%)</p>
+        <p><strong>Scope 2:</strong> ${scope2Emissions.toFixed(2)} tCO₂e (${scope2Percentage}%)</p>
+        <p><strong>Scope 3:</strong> ${scope3Emissions.toFixed(2)} tCO₂e (${scope3Percentage}%)</p>
+        <p><strong>Generated on:</strong> ${new Date().toLocaleDateString()}</p>
+      </div>
+    `;
+    
+    // For now, just alert - would need proper PDF generation
+    alert('Quick PDF download feature - would generate basic PDF report');
+  };
+
   return (
     <div className="max-w-7xl">
       {/* Header */}
@@ -154,10 +251,81 @@ const AnalysisPage = ({ productionData = {} }) => {
           <h2 className="text-2xl font-bold text-gray-800">{t.analysis}</h2>
           <p className="text-sm text-gray-500">January 2025 - December 2025</p>
         </div>
-        <button className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 flex items-center gap-2">
-          <Download size={18} />
-          {t.downloadPDF}
-        </button>
+        
+        {/* PDF Report Dropdown */}
+        <div className="relative" ref={dropdownRef}>
+          <div className="flex">
+            {/* Main PDF Button */}
+            <button 
+              onClick={quickDownloadPDF}
+              className="px-4 py-2 bg-teal-600 text-white rounded-l-lg hover:bg-teal-700 flex items-center gap-2"
+            >
+              <Download size={18} />
+              {t.downloadPDF}
+            </button>
+            
+            {/* Dropdown Button */}
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="px-2 py-2 bg-teal-600 text-white rounded-r-lg hover:bg-teal-700 border-l border-teal-500"
+            >
+              <ChevronDown size={18} />
+            </button>
+          </div>
+
+          {/* Dropdown Menu */}
+          {showDropdown && (
+            <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border z-10">
+              <div className="p-2">
+                <button
+                  onClick={() => {
+                    quickDownloadPDF();
+                    setShowDropdown(false);
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded flex items-center gap-2"
+                >
+                  <Download size={16} />
+                  <div>
+                    <div className="font-medium">Quick Download</div>
+                    <div className="text-xs text-gray-500">Basic PDF with standard layout</div>
+                  </div>
+                </button>
+                
+                <button
+                  onClick={() => {
+                    setShowReportDesigner(true);
+                    setShowDropdown(false);
+                  }}
+                  className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded flex items-center gap-2"
+                >
+                  <Palette size={16} />
+                  <div>
+                    <div className="font-medium">Custom Report Designer</div>
+                    <div className="text-xs text-gray-500">Design your report with custom layout</div>
+                  </div>
+                </button>
+                
+                <div className="border-t mt-2 pt-2">
+                  <div className="px-3 py-1 text-xs text-gray-500 font-medium">Recent Templates</div>
+                  <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded flex items-center gap-2">
+                    <Settings size={16} />
+                    <div>
+                      <div className="text-sm">Executive Summary</div>
+                      <div className="text-xs text-gray-500">Last used 2 days ago</div>
+                    </div>
+                  </button>
+                  <button className="w-full text-left px-3 py-2 hover:bg-gray-100 rounded flex items-center gap-2">
+                    <BarChart3 size={16} />
+                    <div>
+                      <div className="text-sm">Detailed Analysis</div>
+                      <div className="text-xs text-gray-500">Last used 1 week ago</div>
+                    </div>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Top Stats Cards */}
@@ -169,6 +337,12 @@ const AnalysisPage = ({ productionData = {} }) => {
           </div>
           <p className="text-3xl font-bold text-gray-900">{totalEmissions.toFixed(3).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</p>
           <p className="text-xs text-gray-500 mt-1">tCO₂e</p>
+          {renewableReduction > 0 && (
+            <div className="mt-2 text-xs">
+              <p className="text-gray-600">Gross: {grossTotalEmissions.toFixed(2)} tCO₂e</p>
+              <p className="text-green-600">Renewable reduction: -{renewableReduction.toFixed(2)} tCO₂e</p>
+            </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-sm p-6">
@@ -432,6 +606,14 @@ const AnalysisPage = ({ productionData = {} }) => {
         </svg>
         <span className="text-sm font-bold text-red-600 tracking-wider">KREA</span>
       </div>
+
+      {/* Report Designer Modal */}
+      <ReportDesigner
+        isOpen={showReportDesigner}
+        onClose={() => setShowReportDesigner(false)}
+        data={reportData}
+        t={t}
+      />
     </div>
   );
 };
